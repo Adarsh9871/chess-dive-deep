@@ -67,6 +67,69 @@ export type Database = {
           },
         ]
       }
+      coach_availability: {
+        Row: {
+          coach_id: string
+          created_at: string
+          day_of_week: number
+          end_time: string
+          id: string
+          is_available: boolean | null
+          start_time: string
+        }
+        Insert: {
+          coach_id: string
+          created_at?: string
+          day_of_week: number
+          end_time: string
+          id?: string
+          is_available?: boolean | null
+          start_time: string
+        }
+        Update: {
+          coach_id?: string
+          created_at?: string
+          day_of_week?: number
+          end_time?: string
+          id?: string
+          is_available?: boolean | null
+          start_time?: string
+        }
+        Relationships: []
+      }
+      coach_student_assignments: {
+        Row: {
+          assigned_by: string
+          coach_id: string
+          created_at: string
+          id: string
+          notes: string | null
+          status: string
+          student_id: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_by: string
+          coach_id: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          status?: string
+          student_id: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_by?: string
+          coach_id?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          status?: string
+          student_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       makeup_requests: {
         Row: {
           created_at: string
@@ -144,13 +207,56 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          created_at: string
+          email_sent: boolean | null
+          id: string
+          is_read: boolean | null
+          message: string
+          related_id: string | null
+          sms_sent: boolean | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email_sent?: boolean | null
+          id?: string
+          is_read?: boolean | null
+          message: string
+          related_id?: string | null
+          sms_sent?: boolean | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email_sent?: boolean | null
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          related_id?: string | null
+          sms_sent?: boolean | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
           created_at: string
           display_name: string | null
+          email: string | null
+          email_notifications: boolean | null
           id: string
+          phone: string | null
           role: string | null
+          sms_notifications: boolean | null
           updated_at: string
           user_id: string
           username: string | null
@@ -159,8 +265,12 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           display_name?: string | null
+          email?: string | null
+          email_notifications?: boolean | null
           id?: string
+          phone?: string | null
           role?: string | null
+          sms_notifications?: boolean | null
           updated_at?: string
           user_id: string
           username?: string | null
@@ -169,8 +279,12 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           display_name?: string | null
+          email?: string | null
+          email_notifications?: boolean | null
           id?: string
+          phone?: string | null
           role?: string | null
+          sms_notifications?: boolean | null
           updated_at?: string
           user_id?: string
           username?: string | null
@@ -207,6 +321,45 @@ export type Database = {
           status?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      slot_requests: {
+        Row: {
+          admin_notes: string | null
+          coach_id: string
+          created_at: string
+          id: string
+          notes: string | null
+          requested_date: string
+          requested_time: string
+          status: string
+          student_id: string
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          coach_id: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          requested_date: string
+          requested_time: string
+          status?: string
+          student_id: string
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          coach_id?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          requested_date?: string
+          requested_time?: string
+          status?: string
+          student_id?: string
+          updated_at?: string
         }
         Relationships: []
       }
