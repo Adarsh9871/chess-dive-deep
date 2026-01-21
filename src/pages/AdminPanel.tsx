@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -17,16 +16,20 @@ import {
   MessageSquare,
   Send,
   Search,
-  UserPlus,
   Trash2,
-  Edit,
   Bell,
+  Link2,
+  Clock,
+  RefreshCw,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
+import CoachAssignmentTab from "@/components/admin/CoachAssignmentTab";
+import SlotRequestsTab from "@/components/admin/SlotRequestsTab";
+import MakeupRequestsAdminTab from "@/components/admin/MakeupRequestsAdminTab";
 
 type UserRole = "admin" | "coach" | "student";
 
@@ -46,6 +49,8 @@ interface ClassData {
   scheduled_time: string;
   status: string;
   notes: string | null;
+  coach_name?: string;
+  student_name?: string;
 }
 
 interface MessageData {
@@ -68,13 +73,13 @@ const AdminPanel = () => {
   const [classes, setClasses] = useState<ClassData[]>([]);
   const [messages, setMessages] = useState<MessageData[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [pendingCounts, setPendingCounts] = useState({ slots: 0, makeup: 0 });
   
   // Announcement form
   const [announcementSubject, setAnnouncementSubject] = useState("");
   const [announcementContent, setAnnouncementContent] = useState("");
   const [sendingAnnouncement, setSendingAnnouncement] = useState(false);
 
-  // Check admin status
   useEffect(() => {
     const checkAdmin = async () => {
       if (!user) {
@@ -98,13 +103,26 @@ const AdminPanel = () => {
       setIsAdmin(true);
       setLoading(false);
       fetchData();
+      fetchPendingCounts();
     };
 
     checkAdmin();
   }, [user, navigate]);
 
+  const fetchPendingCounts = async () => {
+    const [slotsRes, makeupRes] = await Promise.all([
+      supabase.from("slot_requests").select("*", { count: 'exact', head: true }).eq("status", "pending"),
+      supabase.from("makeup_requests").select("*", { count: 'exact', head: true }).eq("status", "pending"),
+    ]);
+
+    setPendingCounts({
+      slots: slotsRes.count || 0,
+      makeup: makeupRes.count || 0,
+    });
+  };
+
   const fetchData = async () => {
-    // Fetch users with their roles
+    // Fetch profiles
     const { data: profiles } = await supabase
       .from("profiles")
       .select("user_id, display_name, created_at");
@@ -125,17 +143,22 @@ const AdminPanel = () => {
         };
       });
       setUsers(usersWithRoles);
-    }
 
-    // Fetch classes
-    const { data: classesData } = await supabase
-      .from("classes")
-      .select("*")
-      .order("scheduled_date", { ascending: false })
-      .limit(50);
+      // Fetch classes with names
+      const { data: classesData } = await supabase
+        .from("classes")
+        .select("*")
+        .order("scheduled_date", { ascending: false })
+        .limit(50);
 
-    if (classesData) {
-      setClasses(classesData);
+      if (classesData) {
+        const enrichedClasses = classesData.map(c => ({
+          ...c,
+          coach_name: profiles.find(p => p.user_id === c.coach_id)?.display_name || 'Unknown',
+          student_name: profiles.find(p => p.user_id === c.student_id)?.display_name || 'Unknown',
+        }));
+        setClasses(enrichedClasses);
+      }
     }
 
     // Fetch messages
@@ -151,10 +174,8 @@ const AdminPanel = () => {
   };
 
   const updateUserRole = async (userId: string, newRole: UserRole) => {
-    // First delete existing role
     await supabase.from("user_roles").delete().eq("user_id", userId);
 
-    // Insert new role
     const { error } = await supabase.from("user_roles").insert({
       user_id: userId,
       role: newRole,
@@ -196,13 +217,36 @@ const AdminPanel = () => {
       is_announcement: true,
     });
 
-    setSendingAnnouncement(false);
-
     if (error) {
       toast.error("Failed to send announcement");
+      setSendingAnnouncement(false);
       return;
     }
 
+    // Send email notifications to all users
+    const { data: allProfiles } = await supabase
+      .from("profiles")
+      .select("user_id, email_notifications")
+      .eq("email_notifications", true);
+
+    if (allProfiles) {
+      for (const profile of allProfiles.slice(0, 50)) { // Limit to 50 to prevent timeout
+        try {
+          await supabase.functions.invoke('send-notification', {
+            body: {
+              userId: profile.user_id,
+              type: 'announcement',
+              title: announcementSubject,
+              message: announcementContent,
+            }
+          });
+        } catch (e) {
+          console.log("Failed to send notification:", e);
+        }
+      }
+    }
+
+    setSendingAnnouncement(false);
     toast.success("Announcement sent to all users!");
     setAnnouncementSubject("");
     setAnnouncementContent("");
@@ -234,12 +278,34 @@ const AdminPanel = () => {
           <Shield className="w-8 h-8 text-primary" />
           <div>
             <h1 className="text-3xl font-display font-bold text-foreground">Admin Panel</h1>
-            <p className="text-muted-foreground">Manage users, classes, and announcements</p>
+            <p className="text-muted-foreground">Full control over users, classes, and assignments</p>
           </div>
         </div>
 
-        <Tabs defaultValue="users" className="space-y-6">
-          <TabsList className="bg-background border">
+        <Tabs defaultValue="assignments" className="space-y-6">
+          <TabsList className="bg-background border h-auto flex-wrap p-1">
+            <TabsTrigger value="assignments" className="gap-2">
+              <Link2 className="w-4 h-4" />
+              Assignments
+            </TabsTrigger>
+            <TabsTrigger value="slots" className="gap-2 relative">
+              <Clock className="w-4 h-4" />
+              Slot Requests
+              {pendingCounts.slots > 0 && (
+                <Badge variant="destructive" className="ml-1 h-5 w-5 p-0 flex items-center justify-center text-xs">
+                  {pendingCounts.slots}
+                </Badge>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="makeup" className="gap-2 relative">
+              <RefreshCw className="w-4 h-4" />
+              Makeup Requests
+              {pendingCounts.makeup > 0 && (
+                <Badge variant="destructive" className="ml-1 h-5 w-5 p-0 flex items-center justify-center text-xs">
+                  {pendingCounts.makeup}
+                </Badge>
+              )}
+            </TabsTrigger>
             <TabsTrigger value="users" className="gap-2">
               <Users className="w-4 h-4" />
               Users
@@ -257,6 +323,21 @@ const AdminPanel = () => {
               Announce
             </TabsTrigger>
           </TabsList>
+
+          {/* Coach-Student Assignments Tab */}
+          <TabsContent value="assignments">
+            <CoachAssignmentTab />
+          </TabsContent>
+
+          {/* Slot Requests Tab */}
+          <TabsContent value="slots">
+            <SlotRequestsTab />
+          </TabsContent>
+
+          {/* Makeup Requests Tab */}
+          <TabsContent value="makeup">
+            <MakeupRequestsAdminTab />
+          </TabsContent>
 
           {/* Users Tab */}
           <TabsContent value="users">
@@ -283,9 +364,9 @@ const AdminPanel = () => {
                   <TableHeader>
                     <TableRow>
                       <TableHead>User</TableHead>
-                      <TableHead>Role</TableHead>
+                      <TableHead>Current Role</TableHead>
                       <TableHead>Joined</TableHead>
-                      <TableHead>Actions</TableHead>
+                      <TableHead>Change Role</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -341,8 +422,8 @@ const AdminPanel = () => {
           <TabsContent value="classes">
             <Card>
               <CardHeader>
-                <CardTitle>Class Management</CardTitle>
-                <CardDescription>View and manage all scheduled classes</CardDescription>
+                <CardTitle>All Scheduled Classes</CardTitle>
+                <CardDescription>View and manage all classes in the system</CardDescription>
               </CardHeader>
               <CardContent>
                 <Table>
@@ -350,8 +431,9 @@ const AdminPanel = () => {
                     <TableRow>
                       <TableHead>Date</TableHead>
                       <TableHead>Time</TableHead>
+                      <TableHead>Coach</TableHead>
+                      <TableHead>Student</TableHead>
                       <TableHead>Status</TableHead>
-                      <TableHead>Notes</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -360,6 +442,8 @@ const AdminPanel = () => {
                       <TableRow key={c.id}>
                         <TableCell>{format(new Date(c.scheduled_date), "MMM d, yyyy")}</TableCell>
                         <TableCell>{c.scheduled_time}</TableCell>
+                        <TableCell>{c.coach_name}</TableCell>
+                        <TableCell>{c.student_name || '-'}</TableCell>
                         <TableCell>
                           <Badge
                             variant={
@@ -372,9 +456,6 @@ const AdminPanel = () => {
                           >
                             {c.status}
                           </Badge>
-                        </TableCell>
-                        <TableCell className="max-w-[200px] truncate">
-                          {c.notes || "-"}
                         </TableCell>
                         <TableCell>
                           <Button
@@ -443,7 +524,7 @@ const AdminPanel = () => {
             <Card>
               <CardHeader>
                 <CardTitle>Send Announcement</CardTitle>
-                <CardDescription>Broadcast a message to all users</CardDescription>
+                <CardDescription>Broadcast a message to all users (with email notification)</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
@@ -469,7 +550,7 @@ const AdminPanel = () => {
                   className="w-full"
                 >
                   <Send className="w-4 h-4 mr-2" />
-                  {sendingAnnouncement ? "Sending..." : "Send Announcement"}
+                  {sendingAnnouncement ? "Sending..." : "Send Announcement (with Email)"}
                 </Button>
               </CardContent>
             </Card>
