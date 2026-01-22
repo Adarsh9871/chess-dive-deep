@@ -1,0 +1,13 @@
+project_id = "mbudllcdkrnxkzuloukv"
+
+[functions.send-notification]
+verify_jwt = false
+
+[functions.setup-admin]
+verify_jwt = false
+
+[functions.text-to-speech]
+verify_jwt = false
+
+[functions.create-calendar-event]
+verify_jwt = false
