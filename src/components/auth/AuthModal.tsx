@@ -6,11 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
-<<<<<<< HEAD
-import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-=======
->>>>>>> target/main
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -25,32 +20,6 @@ const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
   const [username, setUsername] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { signIn, signUp } = useAuth();
-<<<<<<< HEAD
-  const navigate = useNavigate();
-
-  const redirectBasedOnRole = async (userId: string) => {
-    // Fetch user role
-    const { data: roleData } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId)
-      .maybeSingle();
-
-    const role = roleData?.role || "student";
-
-    switch (role) {
-      case "admin":
-        navigate("/admin");
-        break;
-      case "coach":
-        navigate("/coach-dashboard");
-        break;
-      default:
-        navigate("/student-dashboard");
-    }
-  };
-=======
->>>>>>> target/main
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,48 +34,6 @@ const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
         const { error } = await signIn(email, password);
         if (error) {
           toast.error(error.message || "Login failed");
-<<<<<<< HEAD
-          setIsLoading(false);
-          return;
-        }
-        
-        toast.success("Welcome back! 🎉");
-        onSuccess?.();
-        resetForm();
-        onClose();
-        
-        // Wait a moment for the session to be established, then get user
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          await redirectBasedOnRole(user.id);
-        } else {
-          // Fallback: try to get session
-          const { data: { session } } = await supabase.auth.getSession();
-          if (session?.user) {
-            await redirectBasedOnRole(session.user.id);
-          } else {
-            navigate("/student-dashboard");
-          }
-        }
-      } else {
-        const { data, error } = await signUp(email, password, username);
-        if (error) {
-          toast.error(error.message || "Signup failed");
-          setIsLoading(false);
-          return;
-        }
-        
-        toast.success("Account created! Welcome to ChessPals! 🎉");
-        onSuccess?.();
-        resetForm();
-        onClose();
-        
-        // New signups go to student dashboard by default
-        if (data?.user) {
-          navigate("/student-dashboard");
-=======
         } else {
           toast.success("Welcome back! 🎉");
           onSuccess?.();
@@ -122,7 +49,6 @@ const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
           onSuccess?.();
           onClose();
           resetForm();
->>>>>>> target/main
         }
       }
     } catch (err) {

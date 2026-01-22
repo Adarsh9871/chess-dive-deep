@@ -12,10 +12,6 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import DemoClass from "./pages/DemoClass";
 import CoachDashboard from "./pages/CoachDashboard";
-<<<<<<< HEAD
-import StudentDashboard from "./pages/StudentDashboard";
-=======
->>>>>>> target/main
 import AdminPanel from "./pages/AdminPanel";
 import Program from "./pages/Program";
 import NotFound from "./pages/NotFound";
@@ -38,12 +34,7 @@ const App = () => (
           <Route path="/contact" element={<Contact />} />
           <Route path="/demo" element={<DemoClass />} />
           <Route path="/coach-dashboard" element={<CoachDashboard />} />
-<<<<<<< HEAD
-          <Route path="/student-dashboard" element={<StudentDashboard />} />
-          <Route path="/dashboard" element={<StudentDashboard />} />
-=======
           <Route path="/dashboard" element={<CoachDashboard />} />
->>>>>>> target/main
           <Route path="/admin" element={<AdminPanel />} />
           <Route path="/program" element={<Program />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

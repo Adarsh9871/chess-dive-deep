@@ -10,12 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { format } from "date-fns";
-<<<<<<< HEAD
-import { UserPlus, Users, Trash2, Link2, Video, Calendar, ExternalLink } from "lucide-react";
-import ScheduleClassDialog from "@/components/calendar/ScheduleClassDialog";
-=======
 import { UserPlus, Users, Trash2, Link2 } from "lucide-react";
->>>>>>> target/main
 
 interface Assignment {
   id: string;
@@ -41,11 +36,6 @@ const CoachAssignmentTab = () => {
   const [students, setStudents] = useState<UserInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [showDialog, setShowDialog] = useState(false);
-<<<<<<< HEAD
-  const [showScheduleDialog, setShowScheduleDialog] = useState(false);
-  const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
-=======
->>>>>>> target/main
 
   // Form state
   const [selectedCoach, setSelectedCoach] = useState("");
@@ -129,30 +119,6 @@ const CoachAssignmentTab = () => {
     setNotes("");
     fetchData();
 
-<<<<<<< HEAD
-    // Send notification to both coach and student
-    try {
-      const coachName = coaches.find(c => c.user_id === selectedCoach)?.display_name || 'your coach';
-      const studentName = students.find(s => s.user_id === selectedStudent)?.display_name || 'a new student';
-
-      // Notify student
-      await supabase.functions.invoke('send-notification', {
-        body: {
-          userId: selectedStudent,
-          type: 'coach_assigned',
-          title: '🎓 Coach Assigned!',
-          message: `You have been assigned to ${coachName} for 1-on-1 chess lessons. Your coach will schedule your first class soon!`,
-        }
-      });
-
-      // Notify coach
-      await supabase.functions.invoke('send-notification', {
-        body: {
-          userId: selectedCoach,
-          type: 'coach_assigned',
-          title: '👨‍🎓 New Student Assigned!',
-          message: `${studentName} has been assigned to you for 1-on-1 coaching. Please schedule your first class with them.`,
-=======
     // Send notification to student
     try {
       const coachName = coaches.find(c => c.user_id === selectedCoach)?.display_name || 'your coach';
@@ -162,7 +128,6 @@ const CoachAssignmentTab = () => {
           type: 'class_scheduled',
           title: 'Coach Assigned',
           message: `You have been assigned to ${coachName} for 1-on-1 chess lessons. Check your dashboard to view available slots and book sessions.`,
->>>>>>> target/main
         }
       });
     } catch (e) {
@@ -200,70 +165,6 @@ const CoachAssignmentTab = () => {
     fetchData();
   };
 
-<<<<<<< HEAD
-  const handleScheduleClass = (assignment: Assignment) => {
-    setSelectedAssignment(assignment);
-    setShowScheduleDialog(true);
-  };
-
-  const startInstantMeet = async (assignment: Assignment) => {
-    // Generate a quick meet link
-    const chars = "abcdefghijklmnopqrstuvwxyz";
-    const generateCode = (len: number) =>
-      Array.from({ length: len }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
-    
-    const meetCode = `${generateCode(3)}-${generateCode(4)}-${generateCode(3)}`;
-    const meetLink = `https://meet.google.com/${meetCode}`;
-
-    // Create an instant class entry
-    const today = new Date();
-    const { error } = await supabase.from("classes").insert({
-      coach_id: assignment.coach_id,
-      student_id: assignment.student_id,
-      scheduled_date: format(today, "yyyy-MM-dd"),
-      scheduled_time: format(today, "HH:mm"),
-      status: "scheduled",
-      meet_link: meetLink,
-      notes: "Instant session started by admin",
-      duration_minutes: 60,
-    });
-
-    if (error) {
-      toast.error("Failed to create session");
-      return;
-    }
-
-    // Send notifications
-    try {
-      await supabase.functions.invoke('send-notification', {
-        body: {
-          userId: assignment.student_id,
-          type: 'class_scheduled',
-          title: '🎥 Class Starting Now!',
-          message: `Your 1-on-1 class with ${assignment.coach_name} is starting now. Join the Google Meet!`,
-          meetLink: meetLink,
-        }
-      });
-
-      await supabase.functions.invoke('send-notification', {
-        body: {
-          userId: assignment.coach_id,
-          type: 'class_scheduled',
-          title: '🎥 Class Starting Now!',
-          message: `Your 1-on-1 class with ${assignment.student_name} is starting now.`,
-          meetLink: meetLink,
-        }
-      });
-    } catch (e) {
-      console.log("Notification failed:", e);
-    }
-
-    toast.success("Session created! Opening Google Meet...");
-    window.open(meetLink, "_blank");
-  };
-
-=======
->>>>>>> target/main
   if (loading) {
     return (
       <Card>
@@ -285,11 +186,7 @@ const CoachAssignmentTab = () => {
                 Coach-Student Assignments
               </CardTitle>
               <CardDescription>
-<<<<<<< HEAD
-                Assign coaches to students for 1-on-1 teaching sessions with Google Meet integration
-=======
                 Assign coaches to students for 1-on-1 teaching sessions
->>>>>>> target/main
               </CardDescription>
             </div>
             <Dialog open={showDialog} onOpenChange={setShowDialog}>
@@ -360,95 +257,6 @@ const CoachAssignmentTab = () => {
         </CardHeader>
         <CardContent>
           {assignments.length > 0 ? (
-<<<<<<< HEAD
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Coach</TableHead>
-                    <TableHead>Student</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Assigned</TableHead>
-                    <TableHead>Quick Actions</TableHead>
-                    <TableHead>Manage</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {assignments.map((a) => (
-                    <TableRow key={a.id}>
-                      <TableCell className="font-medium">
-                        <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                            <Users className="w-4 h-4 text-primary" />
-                          </div>
-                          {a.coach_name}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
-                            <Users className="w-4 h-4" />
-                          </div>
-                          {a.student_name}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Select
-                          value={a.status}
-                          onValueChange={(val) => updateStatus(a.id, val)}
-                        >
-                          <SelectTrigger className="w-28">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="active">Active</SelectItem>
-                            <SelectItem value="paused">Paused</SelectItem>
-                            <SelectItem value="completed">Completed</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </TableCell>
-                      <TableCell className="text-muted-foreground text-sm">
-                        {format(new Date(a.created_at), "MMM d, yyyy")}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex gap-1">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => startInstantMeet(a)}
-                            className="gap-1"
-                            title="Start instant Google Meet"
-                          >
-                            <Video className="w-4 h-4" />
-                            Meet
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleScheduleClass(a)}
-                            className="gap-1"
-                            title="Schedule a class"
-                          >
-                            <Calendar className="w-4 h-4" />
-                            Schedule
-                          </Button>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => deleteAssignment(a.id)}
-                        >
-                          <Trash2 className="w-4 h-4 text-destructive" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-=======
             <Table>
               <TableHeader>
                 <TableRow>
@@ -504,7 +312,6 @@ const CoachAssignmentTab = () => {
                 ))}
               </TableBody>
             </Table>
->>>>>>> target/main
           ) : (
             <div className="text-center py-12 text-muted-foreground">
               <Link2 className="w-12 h-12 mx-auto mb-3 opacity-30" />
@@ -516,11 +323,7 @@ const CoachAssignmentTab = () => {
       </Card>
 
       {/* Quick Stats */}
-<<<<<<< HEAD
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-=======
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
->>>>>>> target/main
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
@@ -557,46 +360,12 @@ const CoachAssignmentTab = () => {
                 <p className="text-2xl font-bold">
                   {assignments.filter(a => a.status === 'active').length}
                 </p>
-<<<<<<< HEAD
-                <p className="text-sm text-muted-foreground">Active Pairs</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center">
-                <Video className="w-6 h-6 text-orange-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{assignments.length}</p>
-                <p className="text-sm text-muted-foreground">Total Sessions</p>
-=======
                 <p className="text-sm text-muted-foreground">Active Assignments</p>
->>>>>>> target/main
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
-<<<<<<< HEAD
-
-      {/* Schedule Dialog */}
-      {selectedAssignment && (
-        <ScheduleClassDialog
-          open={showScheduleDialog}
-          onOpenChange={setShowScheduleDialog}
-          onSuccess={() => {
-            toast.success("Class scheduled!");
-            setSelectedAssignment(null);
-          }}
-          isCoach={true}
-          preselectedStudent={selectedAssignment.student_id}
-        />
-      )}
-=======
->>>>>>> target/main
     </div>
   );
 };
