@@ -411,6 +411,7 @@ const Play = () => {
     <div className="min-h-screen bg-background">
       <Header />
 
+<<<<<<< HEAD
       {/* Game Over Banner */}
       {gamePhase === "playing" && game.isGameOver() && (
         <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50">
@@ -429,6 +430,25 @@ const Play = () => {
                 : "Draw!"
               }
             </span>
+=======
+      {/* Always-visible thinking overlay (so users always see feedback) */}
+      {gamePhase === "playing" && isThinking && (
+        <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50">
+          <div className="flex items-center gap-3 px-4 py-2 rounded-full bg-card/95 backdrop-blur border border-primary/20 shadow-lg">
+            <Loader2 className="w-4 h-4 animate-spin text-primary" />
+            <span className="text-sm font-medium text-foreground">
+              Bot thinking… {(thinkingTime / 1000).toFixed(1)}s
+            </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={cancelBotMove}
+              className="h-7 px-2 text-xs text-destructive hover:bg-destructive/10"
+            >
+              <X className="w-3 h-3 mr-1" />
+              Quick move
+            </Button>
+>>>>>>> target/main
           </div>
         </div>
       )}
@@ -616,16 +636,24 @@ const Play = () => {
 
           {/* Playing Phase */}
           {gamePhase === "playing" && (
+<<<<<<< HEAD
             <div className="pb-48 sm:pb-52 lg:pb-4">
               <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 lg:gap-6 justify-center items-center lg:items-start">
                 {/* Main Game Area */}
                 <div className="flex flex-col items-center gap-2 sm:gap-3 order-1 w-full lg:w-auto">
                   {/* Control Bar - Responsive */}
                   <div className="flex gap-1 flex-wrap justify-center items-center bg-card/80 backdrop-blur-sm rounded-full px-2 sm:px-3 py-1 sm:py-1.5 border shadow-sm max-w-full overflow-x-auto">
+=======
+            <div className="pb-48 lg:pb-0">
+              <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 justify-center items-center lg:items-start">
+                <div className="flex flex-col items-center gap-2 sm:gap-4 order-1">
+                  <div className="flex gap-1 sm:gap-2 mb-1 sm:mb-2 flex-wrap justify-center items-center">
+>>>>>>> target/main
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => setShowGuide(true)}
+<<<<<<< HEAD
                       className="text-[10px] xs:text-xs sm:text-sm px-1.5 xs:px-2 sm:px-3 rounded-full h-7 sm:h-8"
                     >
                       <Lightbulb className="w-3 h-3 sm:w-4 sm:h-4 mr-0.5 sm:mr-1" />
@@ -634,22 +662,43 @@ const Play = () => {
                     <Button variant="ghost" size="sm" onClick={flipBoard} className="text-[10px] xs:text-xs sm:text-sm px-1.5 xs:px-2 sm:px-3 rounded-full h-7 sm:h-8">
                       <RotateCcw className="w-3 h-3 sm:w-4 sm:h-4 mr-0.5 sm:mr-1" />
                       <span className="hidden xs:inline">Flip</span>
+=======
+                      className="text-xs sm:text-sm px-2 sm:px-3"
+                    >
+                      <Lightbulb className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                      Help
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={flipBoard} className="text-xs sm:text-sm px-2 sm:px-3">
+                      <RotateCcw className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                      Flip
+>>>>>>> target/main
                     </Button>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={handleUndo}
                       disabled={gameHistory.length < 2 || isThinking}
+<<<<<<< HEAD
                       className="text-[10px] xs:text-xs sm:text-sm px-1.5 xs:px-2 sm:px-3 rounded-full h-7 sm:h-8"
                     >
                       <Undo2 className="w-3 h-3 sm:w-4 sm:h-4 mr-0.5 sm:mr-1" />
                       <span className="hidden xs:inline">Undo</span>
+=======
+                      className="text-xs sm:text-sm px-2 sm:px-3"
+                    >
+                      <Undo2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                      Undo
+>>>>>>> target/main
                     </Button>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => setSoundEnabled(!soundEnabled)}
+<<<<<<< HEAD
                       className="text-[10px] xs:text-xs sm:text-sm px-1.5 xs:px-2 sm:px-3 rounded-full h-7 sm:h-8"
+=======
+                      className="text-xs sm:text-sm px-2 sm:px-3"
+>>>>>>> target/main
                     >
                       {soundEnabled ? (
                         <Volume2 className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -657,20 +706,34 @@ const Play = () => {
                         <VolumeX className="w-3 h-3 sm:w-4 sm:h-4" />
                       )}
                     </Button>
+<<<<<<< HEAD
                     <div className="flex items-center gap-1 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full bg-muted/50">
+=======
+                    {/* Hints Toggle */}
+                    <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-muted/50">
+>>>>>>> target/main
                       {autoSuggestions ? (
                         <Eye className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
                       ) : (
                         <EyeOff className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground" />
                       )}
+<<<<<<< HEAD
                       <Switch
                         checked={autoSuggestions}
                         onCheckedChange={toggleAutoSuggestions}
                         className="scale-[0.65] sm:scale-75"
+=======
+                      <span className="text-xs hidden sm:inline">Hints</span>
+                      <Switch
+                        checked={autoSuggestions}
+                        onCheckedChange={toggleAutoSuggestions}
+                        className="scale-75"
+>>>>>>> target/main
                       />
                     </div>
                   </div>
 
+<<<<<<< HEAD
                   {/* Bot Player Card - Top of Board - Responsive */}
                   <div className={`w-full max-w-[280px] xs:max-w-[320px] sm:max-w-[384px] md:max-w-[448px] lg:max-w-[400px] xl:max-w-[448px] p-2 sm:p-3 rounded-lg sm:rounded-xl transition-all flex items-center justify-between ${
                     game.turn() !== playerColor && !game.isGameOver() 
@@ -756,6 +819,48 @@ const Play = () => {
 
                 {/* Side Panel - Game Info - Responsive */}
                 <div className="w-full sm:w-80 lg:w-64 xl:w-80 order-3 lg:order-2 px-2 sm:px-0">
+=======
+                  {/* Thinking Timer with Cancel */}
+                  {isThinking && (
+                    <div className="flex items-center justify-center gap-3 mb-2 px-4 py-2 bg-primary/10 rounded-xl border border-primary/20">
+                      <div className="flex items-center gap-2">
+                        <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                        <span className="text-sm font-medium text-foreground">
+                          Bot thinking... {(thinkingTime / 1000).toFixed(1)}s
+                        </span>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={cancelBotMove}
+                        className="text-xs px-2 py-1 h-7 text-destructive hover:bg-destructive/10"
+                      >
+                        <X className="w-3 h-3 mr-1" />
+                        Force Quick Move
+                      </Button>
+                    </div>
+                  )}
+
+                  <ChessBoard
+                    game={game}
+                    onMove={handlePlayerMove}
+                    playerColor={playerColor}
+                    disabled={isThinking || game.isGameOver()}
+                    lastMove={lastMove}
+                    showHints={true}
+                    highlightedSquares={highlightedSquares}
+                  />
+
+                  <p className="text-xs sm:text-sm text-muted-foreground text-center">
+                    You are playing as{" "}
+                    <span className="font-bold">
+                      {playerColor === "w" ? "White ♔" : "Black ♚"}
+                    </span>
+                  </p>
+                </div>
+
+                <div className="w-full sm:w-80 lg:w-64 xl:w-80 order-3 lg:order-2">
+>>>>>>> target/main
                   <GameInfo
                     game={game}
                     playerColor={playerColor}
@@ -768,8 +873,12 @@ const Play = () => {
                   />
                 </div>
 
+<<<<<<< HEAD
                 {/* Live Guide Panel - Desktop Only */}
                 <div className="hidden lg:block order-2 lg:order-3 w-64 xl:w-80">
+=======
+                <div className="hidden lg:block order-2 lg:order-3 w-80">
+>>>>>>> target/main
                   <LiveGuide
                     game={game}
                     isPlayerTurn={game.turn() === playerColor && !isThinking}

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+<<<<<<< HEAD
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -8,10 +9,16 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { Users, GraduationCap, Video, Calendar, Clock, MessageSquare, ExternalLink } from "lucide-react";
 import ScheduleClassDialog from "@/components/calendar/ScheduleClassDialog";
+=======
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { Users, GraduationCap } from "lucide-react";
+>>>>>>> target/main
 
 interface Student {
   student_id: string;
   student_name?: string;
+<<<<<<< HEAD
   student_email?: string;
   status: string;
   created_at: string;
@@ -25,11 +32,16 @@ interface UpcomingClass {
   scheduled_time: string;
   meet_link: string | null;
   status: string;
+=======
+  status: string;
+  created_at: string;
+>>>>>>> target/main
 }
 
 const MyStudentsTab = () => {
   const { user } = useAuth();
   const [students, setStudents] = useState<Student[]>([]);
+<<<<<<< HEAD
   const [upcomingClasses, setUpcomingClasses] = useState<UpcomingClass[]>([]);
   const [loading, setLoading] = useState(true);
   const [showScheduleDialog, setShowScheduleDialog] = useState(false);
@@ -38,6 +50,12 @@ const MyStudentsTab = () => {
   useEffect(() => {
     fetchStudents();
     fetchUpcomingClasses();
+=======
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchStudents();
+>>>>>>> target/main
   }, [user]);
 
   const fetchStudents = async () => {
@@ -51,13 +69,20 @@ const MyStudentsTab = () => {
 
     const { data: profiles } = await supabase
       .from("profiles")
+<<<<<<< HEAD
       .select("user_id, display_name, email");
+=======
+      .select("user_id, display_name");
+>>>>>>> target/main
 
     if (assignments && profiles) {
       const enriched = assignments.map(a => ({
         ...a,
         student_name: profiles.find(p => p.user_id === a.student_id)?.display_name || 'Unknown Student',
+<<<<<<< HEAD
         student_email: profiles.find(p => p.user_id === a.student_id)?.email || '',
+=======
+>>>>>>> target/main
       }));
       setStudents(enriched);
     }
@@ -65,6 +90,7 @@ const MyStudentsTab = () => {
     setLoading(false);
   };
 
+<<<<<<< HEAD
   const fetchUpcomingClasses = async () => {
     if (!user) return;
 
@@ -138,6 +164,8 @@ const MyStudentsTab = () => {
     return upcomingClasses.find(c => c.student_id === studentId);
   };
 
+=======
+>>>>>>> target/main
   if (loading) {
     return (
       <Card>
@@ -149,6 +177,7 @@ const MyStudentsTab = () => {
   }
 
   return (
+<<<<<<< HEAD
     <div className="space-y-6">
       <Card>
         <CardHeader>
@@ -304,6 +333,49 @@ const MyStudentsTab = () => {
         preselectedStudent={selectedStudentId}
       />
     </div>
+=======
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <GraduationCap className="w-5 h-5" />
+          My Students
+        </CardTitle>
+        <CardDescription>
+          Students assigned to you for 1-on-1 coaching
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {students.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {students.map((s) => (
+              <div
+                key={s.student_id}
+                className="p-4 rounded-lg border bg-background hover:border-primary/50 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Users className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-medium">{s.student_name}</p>
+                    <Badge variant="secondary" className="text-xs mt-1">
+                      {s.status}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12 text-muted-foreground">
+            <GraduationCap className="w-12 h-12 mx-auto mb-3 opacity-30" />
+            <p>No students assigned yet</p>
+            <p className="text-sm">Admin will assign students to you</p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+>>>>>>> target/main
   );
 };
 

@@ -21,7 +21,10 @@ export type Database = {
           duration_minutes: number
           id: string
           is_makeup: boolean | null
+<<<<<<< HEAD
           meet_link: string | null
+=======
+>>>>>>> target/main
           notes: string | null
           original_class_id: string | null
           scheduled_date: string
@@ -36,7 +39,10 @@ export type Database = {
           duration_minutes?: number
           id?: string
           is_makeup?: boolean | null
+<<<<<<< HEAD
           meet_link?: string | null
+=======
+>>>>>>> target/main
           notes?: string | null
           original_class_id?: string | null
           scheduled_date: string
@@ -51,7 +57,10 @@ export type Database = {
           duration_minutes?: number
           id?: string
           is_makeup?: boolean | null
+<<<<<<< HEAD
           meet_link?: string | null
+=======
+>>>>>>> target/main
           notes?: string | null
           original_class_id?: string | null
           scheduled_date?: string

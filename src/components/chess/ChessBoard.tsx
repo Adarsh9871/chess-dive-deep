@@ -1,6 +1,9 @@
 import { useState, useCallback, useMemo, memo } from "react";
 import { Chess, Square, PieceSymbol, Color } from "chess.js";
+<<<<<<< HEAD
 import { motion, AnimatePresence } from "framer-motion";
+=======
+>>>>>>> target/main
 
 interface ChessBoardProps {
   game: Chess;
@@ -10,7 +13,10 @@ interface ChessBoardProps {
   lastMove?: { from: Square; to: Square } | null;
   showHints?: boolean;
   highlightedSquares?: { from: Square; to: Square } | null;
+<<<<<<< HEAD
   isThinking?: boolean;
+=======
+>>>>>>> target/main
 }
 
 const pieceSymbols: Record<string, string> = {
@@ -29,12 +35,18 @@ const ChessBoard = memo(({
   lastMove,
   showHints = true,
   highlightedSquares,
+<<<<<<< HEAD
   isThinking = false,
+=======
+>>>>>>> target/main
 }: ChessBoardProps) => {
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
   const [legalMoves, setLegalMoves] = useState<Square[]>([]);
   const [promotionSquare, setPromotionSquare] = useState<{ from: Square; to: Square } | null>(null);
+<<<<<<< HEAD
   const [draggedPiece, setDraggedPiece] = useState<Square | null>(null);
+=======
+>>>>>>> target/main
 
   const isFlipped = playerColor === "b";
 
@@ -142,6 +154,7 @@ const ChessBoard = memo(({
 
   const getSquareClasses = useCallback((square: Square, fileIdx: number, rankIdx: number): string => {
     const isLight = (fileIdx + rankIdx) % 2 === 0;
+<<<<<<< HEAD
     const baseColor = isLight 
       ? "bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-200/80 dark:to-amber-300/80" 
       : "bg-gradient-to-br from-amber-700 to-amber-800 dark:from-amber-800 dark:to-amber-900";
@@ -157,6 +170,21 @@ const ChessBoard = memo(({
       highlight = isLight ? "bg-yellow-300/60" : "bg-yellow-600/50";
     } else if (kingInCheckSquare === square) {
       highlight = "bg-red-500/60 ring-2 ring-red-500 ring-inset";
+=======
+    const baseColor = isLight ? "bg-board-light" : "bg-board-dark";
+    
+    let highlight = "";
+    if (highlightedSquares?.from === square) {
+      highlight = "ring-2 ring-emerald-400/60 ring-inset bg-emerald-400/20";
+    } else if (highlightedSquares?.to === square) {
+      highlight = "ring-2 ring-amber-400/60 ring-inset bg-amber-400/25";
+    } else if (selectedSquare === square) {
+      highlight = "ring-4 ring-primary ring-inset";
+    } else if (lastMove && (lastMove.from === square || lastMove.to === square)) {
+      highlight = "bg-gold/40";
+    } else if (kingInCheckSquare === square) {
+      highlight = "bg-destructive/50";
+>>>>>>> target/main
     }
 
     return `${baseColor} ${highlight}`;
@@ -167,6 +195,7 @@ const ChessBoard = memo(({
 
   return (
     <div className="relative">
+<<<<<<< HEAD
       {/* Board wrapper with shadow and border */}
       <div className="rounded-xl overflow-hidden shadow-2xl border-4 border-amber-900/30 dark:border-amber-700/40">
         {/* Board frame */}
@@ -263,6 +292,68 @@ const ChessBoard = memo(({
             </div>
           ))}
         </div>
+=======
+      <div className="rounded-xl sm:rounded-2xl overflow-hidden shadow-xl sm:shadow-2xl border-2 sm:border-4 border-foreground/20">
+        {displayRanks.map((rank, rankIndex) => (
+          <div key={rank} className="flex">
+            {displayFiles.map((file, fileIndex) => {
+              const square = `${file}${rank}` as Square;
+              const piece = boardState[square];
+              const isLegalMove = showHints && legalMoves.includes(square);
+              const actualFileIndex = isFlipped ? 7 - fileIndex : fileIndex;
+              const actualRankIndex = isFlipped ? 7 - rankIndex : rankIndex;
+
+              return (
+                <div
+                  key={square}
+                  className={`
+                    relative w-10 h-10 xs:w-11 xs:h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-12 lg:h-12 xl:w-14 xl:h-14
+                    flex items-center justify-center cursor-pointer transition-colors duration-100
+                    ${getSquareClasses(square, actualFileIndex, actualRankIndex)}
+                  `}
+                  onClick={() => handleSquareClick(square)}
+                >
+                  {/* Coordinates */}
+                  {fileIndex === 0 && (
+                    <span className="absolute top-0.5 left-0.5 text-[8px] sm:text-[10px] font-bold text-foreground/50">
+                      {rank}
+                    </span>
+                  )}
+                  {rankIndex === 7 && (
+                    <span className="absolute bottom-0.5 right-0.5 text-[8px] sm:text-[10px] font-bold text-foreground/50">
+                      {file}
+                    </span>
+                  )}
+
+                  {/* Legal move dot */}
+                  {isLegalMove && !piece && (
+                    <div className="absolute w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-primary/40" />
+                  )}
+                  {isLegalMove && piece && (
+                    <div className="absolute inset-0 ring-4 ring-primary/40 ring-inset rounded-sm" />
+                  )}
+
+                  {/* Piece */}
+                  {piece && (
+                    <span
+                      className={`text-3xl xs:text-4xl sm:text-4xl md:text-5xl lg:text-4xl xl:text-5xl select-none drop-shadow-md ${
+                        piece.color === "w" ? "text-white" : "text-gray-900"
+                      }`}
+                      style={{
+                        textShadow: piece.color === "w"
+                          ? "1px 1px 2px rgba(0,0,0,0.6), -1px -1px 1px rgba(0,0,0,0.3)"
+                          : "1px 1px 2px rgba(255,255,255,0.4)",
+                      }}
+                    >
+                      {pieceSymbols[`${piece.color}${piece.type}`]}
+                    </span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        ))}
+>>>>>>> target/main
 
         {/* Arrow Overlay */}
         {arrowCoords && (
@@ -279,6 +370,7 @@ const ChessBoard = memo(({
               <marker id="arrowhead" markerWidth="4" markerHeight="4" refX="2" refY="2" orient="auto">
                 <polygon points="0 0, 4 2, 0 4" fill="#f59e0b" />
               </marker>
+<<<<<<< HEAD
               <filter id="glow">
                 <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
                 <feMerge>
@@ -286,25 +378,39 @@ const ChessBoard = memo(({
                   <feMergeNode in="SourceGraphic"/>
                 </feMerge>
               </filter>
+=======
+>>>>>>> target/main
             </defs>
             <line
               x1={arrowCoords.startX} y1={arrowCoords.startY}
               x2={arrowCoords.endX} y2={arrowCoords.endY}
+<<<<<<< HEAD
               stroke="rgba(0,0,0,0.4)" strokeWidth="3" strokeLinecap="round"
+=======
+              stroke="rgba(0,0,0,0.3)" strokeWidth="2.5" strokeLinecap="round"
+>>>>>>> target/main
             />
             <line
               x1={arrowCoords.startX} y1={arrowCoords.startY}
               x2={arrowCoords.endX} y2={arrowCoords.endY}
+<<<<<<< HEAD
               stroke="url(#arrowGradient)" strokeWidth="2" strokeLinecap="round" 
               markerEnd="url(#arrowhead)" filter="url(#glow)"
             />
             <circle cx={arrowCoords.startX} cy={arrowCoords.startY} r="2.5" fill="#22c55e" className="animate-pulse" />
             <circle cx={arrowCoords.endX} cy={arrowCoords.endY} r="3" fill="#f59e0b" className="animate-pulse" />
+=======
+              stroke="url(#arrowGradient)" strokeWidth="1.8" strokeLinecap="round" markerEnd="url(#arrowhead)"
+            />
+            <circle cx={arrowCoords.startX} cy={arrowCoords.startY} r="2" fill="#22c55e" className="animate-pulse" />
+            <circle cx={arrowCoords.endX} cy={arrowCoords.endY} r="2.5" fill="#f59e0b" className="animate-pulse" />
+>>>>>>> target/main
           </svg>
         )}
       </div>
 
       {/* Promotion Dialog */}
+<<<<<<< HEAD
       <AnimatePresence>
         {promotionSquare && (
           <motion.div 
@@ -339,6 +445,28 @@ const ChessBoard = memo(({
           </motion.div>
         )}
       </AnimatePresence>
+=======
+      {promotionSquare && (
+        <div className="absolute inset-0 bg-foreground/50 flex items-center justify-center rounded-xl sm:rounded-2xl z-20">
+          <div className="bg-card rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-2xl">
+            <p className="text-center font-display font-bold text-sm sm:text-lg mb-2 sm:mb-3">
+              Choose your piece! 🎉
+            </p>
+            <div className="flex gap-1.5 sm:gap-2">
+              {(["q", "r", "b", "n"] as PieceSymbol[]).map((p) => (
+                <button
+                  key={p}
+                  className="w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center bg-muted hover:bg-primary/20 rounded-lg sm:rounded-xl transition-colors text-3xl sm:text-4xl"
+                  onClick={() => handlePromotion(p)}
+                >
+                  {pieceSymbols[`${playerColor}${p}`]}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+>>>>>>> target/main
     </div>
   );
 });

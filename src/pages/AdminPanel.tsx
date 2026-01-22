@@ -21,8 +21,11 @@ import {
   Link2,
   Clock,
   RefreshCw,
+<<<<<<< HEAD
   Gamepad2,
   Settings,
+=======
+>>>>>>> target/main
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -32,8 +35,11 @@ import { useNavigate } from "react-router-dom";
 import CoachAssignmentTab from "@/components/admin/CoachAssignmentTab";
 import SlotRequestsTab from "@/components/admin/SlotRequestsTab";
 import MakeupRequestsAdminTab from "@/components/admin/MakeupRequestsAdminTab";
+<<<<<<< HEAD
 import ScheduledGamesAdminTab from "@/components/admin/ScheduledGamesAdminTab";
 import SettingsTab from "@/components/admin/SettingsTab";
+=======
+>>>>>>> target/main
 
 type UserRole = "admin" | "coach" | "student";
 
@@ -77,7 +83,11 @@ const AdminPanel = () => {
   const [classes, setClasses] = useState<ClassData[]>([]);
   const [messages, setMessages] = useState<MessageData[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+<<<<<<< HEAD
   const [pendingCounts, setPendingCounts] = useState({ slots: 0, makeup: 0, games: 0 });
+=======
+  const [pendingCounts, setPendingCounts] = useState({ slots: 0, makeup: 0 });
+>>>>>>> target/main
   
   // Announcement form
   const [announcementSubject, setAnnouncementSubject] = useState("");
@@ -114,16 +124,25 @@ const AdminPanel = () => {
   }, [user, navigate]);
 
   const fetchPendingCounts = async () => {
+<<<<<<< HEAD
     const [slotsRes, makeupRes, gamesRes] = await Promise.all([
       supabase.from("slot_requests").select("*", { count: 'exact', head: true }).eq("status", "pending"),
       supabase.from("makeup_requests").select("*", { count: 'exact', head: true }).eq("status", "pending"),
       supabase.from("scheduled_games").select("*", { count: 'exact', head: true }).eq("status", "scheduled"),
+=======
+    const [slotsRes, makeupRes] = await Promise.all([
+      supabase.from("slot_requests").select("*", { count: 'exact', head: true }).eq("status", "pending"),
+      supabase.from("makeup_requests").select("*", { count: 'exact', head: true }).eq("status", "pending"),
+>>>>>>> target/main
     ]);
 
     setPendingCounts({
       slots: slotsRes.count || 0,
       makeup: makeupRes.count || 0,
+<<<<<<< HEAD
       games: gamesRes.count || 0,
+=======
+>>>>>>> target/main
     });
   };
 
@@ -288,6 +307,7 @@ const AdminPanel = () => {
           </div>
         </div>
 
+<<<<<<< HEAD
         <Tabs defaultValue="games" className="space-y-6">
           <TabsList className="bg-background border h-auto flex-wrap p-1">
             <TabsTrigger value="games" className="gap-2 relative">
@@ -299,6 +319,10 @@ const AdminPanel = () => {
                 </Badge>
               )}
             </TabsTrigger>
+=======
+        <Tabs defaultValue="assignments" className="space-y-6">
+          <TabsList className="bg-background border h-auto flex-wrap p-1">
+>>>>>>> target/main
             <TabsTrigger value="assignments" className="gap-2">
               <Link2 className="w-4 h-4" />
               Assignments
@@ -337,6 +361,7 @@ const AdminPanel = () => {
               <Bell className="w-4 h-4" />
               Announce
             </TabsTrigger>
+<<<<<<< HEAD
             <TabsTrigger value="settings" className="gap-2">
               <Settings className="w-4 h-4" />
               Settings
@@ -348,6 +373,10 @@ const AdminPanel = () => {
             <ScheduledGamesAdminTab />
           </TabsContent>
 
+=======
+          </TabsList>
+
+>>>>>>> target/main
           {/* Coach-Student Assignments Tab */}
           <TabsContent value="assignments">
             <CoachAssignmentTab />
@@ -579,11 +608,14 @@ const AdminPanel = () => {
               </CardContent>
             </Card>
           </TabsContent>
+<<<<<<< HEAD
 
           {/* Settings Tab */}
           <TabsContent value="settings">
             <SettingsTab />
           </TabsContent>
+=======
+>>>>>>> target/main
         </Tabs>
       </main>
 

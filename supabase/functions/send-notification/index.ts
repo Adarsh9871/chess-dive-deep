@@ -9,6 +9,7 @@ const corsHeaders = {
 
 interface NotificationRequest {
   userId: string;
+<<<<<<< HEAD
   type: 'makeup_approved' | 'makeup_rejected' | 'announcement' | 'class_scheduled' | 'slot_approved' | 'slot_rejected' | 'coach_assigned' | 'class_reminder';
   title: string;
   message: string;
@@ -78,13 +79,25 @@ const getEmailTemplate = (title: string, message: string, displayName: string, m
   `;
 };
 
+=======
+  type: 'makeup_approved' | 'makeup_rejected' | 'announcement' | 'class_scheduled' | 'slot_approved' | 'slot_rejected';
+  title: string;
+  message: string;
+  relatedId?: string;
+}
+
+>>>>>>> target/main
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+<<<<<<< HEAD
     const { userId, type, title, message, relatedId, meetLink }: NotificationRequest = await req.json();
+=======
+    const { userId, type, title, message, relatedId }: NotificationRequest = await req.json();
+>>>>>>> target/main
 
     console.log(`Sending notification to user ${userId}: ${type} - ${title}`);
 
@@ -127,7 +140,49 @@ serve(async (req) => {
             password: smtpPass,
           });
 
+<<<<<<< HEAD
           const emailHtml = getEmailTemplate(title, message, profile.display_name || '', meetLink);
+=======
+          const emailHtml = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+              <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px 8px 0 0; }
+                .content { background: #f9fafb; padding: 20px; border: 1px solid #e5e7eb; }
+                .footer { background: #1f2937; color: #9ca3af; padding: 15px; text-align: center; border-radius: 0 0 8px 8px; font-size: 12px; }
+                .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+                .badge-info { background: #dbeafe; color: #1e40af; }
+                .badge-success { background: #dcfce7; color: #166534; }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <div class="header">
+                  <h1 style="margin: 0;">🎓 Chess Academy</h1>
+                </div>
+                <div class="content">
+                  <h2 style="color: #667eea; margin-top: 0;">${title}</h2>
+                  <p>Hello ${profile.display_name || 'there'},</p>
+                  <p>${message}</p>
+                  <p style="margin-top: 20px;">
+                    <a href="${supabaseUrl.replace('.supabase.co', '.lovable.app')}/dashboard" 
+                       style="background: #667eea; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
+                      View Dashboard
+                    </a>
+                  </p>
+                </div>
+                <div class="footer">
+                  <p>Chess Academy - Learn, Play, Excel</p>
+                  <p>You received this email because you have notifications enabled.</p>
+                </div>
+              </div>
+            </body>
+            </html>
+          `;
+>>>>>>> target/main
 
           await client.send({
             from: smtpFrom,
@@ -148,6 +203,7 @@ serve(async (req) => {
       }
     }
 
+<<<<<<< HEAD
     // Send SMS if enabled and phone exists
     if (profile.sms_notifications && profile.phone) {
       try {
@@ -189,6 +245,8 @@ serve(async (req) => {
       }
     }
 
+=======
+>>>>>>> target/main
     // Store notification in database
     const { error: notifError } = await supabase
       .from("notifications")

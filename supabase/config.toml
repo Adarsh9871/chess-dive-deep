@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 project_id = "mbudllcdkrnxkzuloukv"
 
 [functions.send-notification]
@@ -5,9 +6,16 @@ verify_jwt = false
 
 [functions.setup-admin]
 verify_jwt = false
+=======
+project_id = "tluuhrapjmmshxrdiqmh"
+>>>>>>> target/main
 
 [functions.text-to-speech]
 verify_jwt = false
 
+<<<<<<< HEAD
 [functions.create-calendar-event]
+=======
+[functions.send-notification]
+>>>>>>> target/main
 verify_jwt = false

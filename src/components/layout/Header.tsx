@@ -1,10 +1,18 @@
 import { Button } from "@/components/ui/button";
+<<<<<<< HEAD
 import { Crown, Menu, X, LogOut, User, LayoutDashboard, Shield, GraduationCap } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRole } from "@/hooks/useUserRole";
+=======
+import { Crown, Menu, X, LogOut, User, LayoutDashboard } from "lucide-react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+>>>>>>> target/main
 import AuthModal from "@/components/auth/AuthModal";
 import {
   DropdownMenu,
@@ -22,7 +30,10 @@ const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut, loading } = useAuth();
+<<<<<<< HEAD
   const { role, isAdmin, isCoach, getDashboardPath } = useUserRole();
+=======
+>>>>>>> target/main
 
   const navItems = [
     { label: "Play", href: "/play" },
@@ -57,6 +68,7 @@ const Header = () => {
   };
 
   const userInitials = user?.email?.charAt(0).toUpperCase() || "U";
+<<<<<<< HEAD
   const dashboardPath = getDashboardPath();
 
   const getDashboardLabel = () => {
@@ -80,6 +92,8 @@ const Header = () => {
         return <LayoutDashboard className="w-4 h-4" />;
     }
   };
+=======
+>>>>>>> target/main
 
   return (
     <>
@@ -133,6 +147,7 @@ const Header = () => {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48">
                     <DropdownMenuItem asChild>
+<<<<<<< HEAD
                       <Link to={dashboardPath} className="flex items-center gap-2">
                         {getDashboardIcon()}
                         {getDashboardLabel()}
@@ -154,6 +169,19 @@ const Header = () => {
                         </Link>
                       </DropdownMenuItem>
                     )}
+=======
+                      <Link to="/dashboard" className="flex items-center gap-2">
+                        <LayoutDashboard className="w-4 h-4" />
+                        Dashboard
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin" className="flex items-center gap-2">
+                        <User className="w-4 h-4" />
+                        Admin Panel
+                      </Link>
+                    </DropdownMenuItem>
+>>>>>>> target/main
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleSignOut} className="text-destructive">
                       <LogOut className="w-4 h-4 mr-2" />
@@ -225,6 +253,7 @@ const Header = () => {
                   {user ? (
                     <>
                       <Link
+<<<<<<< HEAD
                         to={dashboardPath}
                         className="py-3 px-4 rounded-xl hover:bg-muted font-display font-semibold text-foreground transition-colors flex items-center gap-2"
                         onClick={() => setIsMenuOpen(false)}
@@ -252,6 +281,23 @@ const Header = () => {
                           Coach Dashboard
                         </Link>
                       )}
+=======
+                        to="/dashboard"
+                        className="py-3 px-4 rounded-xl hover:bg-muted font-display font-semibold text-foreground transition-colors flex items-center gap-2"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <LayoutDashboard className="w-4 h-4" />
+                        Dashboard
+                      </Link>
+                      <Link
+                        to="/admin"
+                        className="py-3 px-4 rounded-xl hover:bg-muted font-display font-semibold text-foreground transition-colors flex items-center gap-2"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <User className="w-4 h-4" />
+                        Admin Panel
+                      </Link>
+>>>>>>> target/main
                       <Button variant="destructive" className="w-full" onClick={handleSignOut}>
                         <LogOut className="w-4 h-4 mr-2" />
                         Sign Out

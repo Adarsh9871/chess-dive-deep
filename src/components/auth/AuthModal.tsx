@@ -6,8 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
+<<<<<<< HEAD
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+=======
+>>>>>>> target/main
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -22,6 +25,7 @@ const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
   const [username, setUsername] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { signIn, signUp } = useAuth();
+<<<<<<< HEAD
   const navigate = useNavigate();
 
   const redirectBasedOnRole = async (userId: string) => {
@@ -45,6 +49,8 @@ const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
         navigate("/student-dashboard");
     }
   };
+=======
+>>>>>>> target/main
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,6 +65,7 @@ const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
         const { error } = await signIn(email, password);
         if (error) {
           toast.error(error.message || "Login failed");
+<<<<<<< HEAD
           setIsLoading(false);
           return;
         }
@@ -99,6 +106,23 @@ const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
         // New signups go to student dashboard by default
         if (data?.user) {
           navigate("/student-dashboard");
+=======
+        } else {
+          toast.success("Welcome back! 🎉");
+          onSuccess?.();
+          onClose();
+          resetForm();
+        }
+      } else {
+        const { error } = await signUp(email, password, username);
+        if (error) {
+          toast.error(error.message || "Signup failed");
+        } else {
+          toast.success("Account created! Welcome to ChessPals! 🎉");
+          onSuccess?.();
+          onClose();
+          resetForm();
+>>>>>>> target/main
         }
       }
     } catch (err) {
