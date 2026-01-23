@@ -179,16 +179,17 @@ const CalendarTab = () => {
   };
 
   const submitBookingRequest = async () => {
-    if (!user || !selectedCoach || !bookingDate || !bookingTime) {
-      toast.error("Please fill in all fields");
+    if (!user || !bookingDate || !bookingTime) {
+      toast.error("Please select a date and time");
       return;
     }
     
     setSaving(true);
     
+    // If coach is assigned, use that coach_id, otherwise leave null for admin to assign
     const { error } = await supabase.from("slot_requests").insert({
       student_id: user.id,
-      coach_id: selectedCoach,
+      coach_id: selectedCoach || null,
       requested_date: format(bookingDate, "yyyy-MM-dd"),
       requested_time: bookingTime,
       notes: bookingNotes || null,
@@ -250,15 +251,13 @@ const CalendarTab = () => {
   const handleCellClick = (day: Date, time: string) => {
     if (!isStudent) return;
 
-    if (assignedCoaches.length === 0) {
-      toast.info("A coach will be assigned to you soon. Please check back later!");
-      return;
-    }
-
     setBookingDate(day);
     setBookingTime(time);
-    setShowBookingDialog(true);
+    setShowScheduleDialog(true);
   };
+
+  // New state for direct booking dialog (without coach requirement)
+  const [showScheduleDialog, setShowScheduleDialog] = useState(false);
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -274,149 +273,130 @@ const CalendarTab = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          {isStudent && assignedCoaches.length > 0 && (
-            <Dialog open={showBookingDialog} onOpenChange={setShowBookingDialog}>
-              <DialogTrigger asChild>
-                <Button className="gap-2">
-                  <Plus className="w-4 h-4" />
-                  Book Session
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-md">
-                <DialogHeader>
-                  <DialogTitle className="flex items-center gap-2">
-                    <Video className="w-5 h-5 text-primary" />
-                    Book a 1-on-1 Session
-                  </DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4 pt-4">
-                  {/* Coach Selection */}
-                  <div>
-                    <label className="text-sm font-medium mb-2 block flex items-center gap-2">
-                      <User className="w-4 h-4 text-primary" />
-                      Select Coach
-                    </label>
-                    <Select value={selectedCoach} onValueChange={setSelectedCoach}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Choose your coach" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {assignedCoaches.map((coach) => (
-                          <SelectItem key={coach.coach_id} value={coach.coach_id}>
-                            {coach.display_name || "Coach"}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Date Selection */}
-                  <div>
-                    <label className="text-sm font-medium mb-2 block flex items-center gap-2">
-                      <CalendarIcon className="w-4 h-4 text-primary" />
-                      Select Date
-                    </label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button variant="outline" className="w-full justify-start">
-                          <CalendarIcon className="w-4 h-4 mr-2" />
-                          {bookingDate ? format(bookingDate, "EEE, MMM d, yyyy") : "Pick a date"}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0">
-                        <Calendar
-                          mode="single"
-                          selected={bookingDate}
-                          onSelect={setBookingDate}
-                          disabled={(date) => isBefore(date, startOfToday())}
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-
-                  {/* Time Selection */}
-                  <div>
-                    <label className="text-sm font-medium mb-2 block flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-primary" />
-                      Select Time
-                    </label>
-                    <Select 
-                      value={bookingTime} 
-                      onValueChange={setBookingTime}
-                      disabled={!selectedCoach || !bookingDate}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder={selectedCoach && bookingDate ? "Choose time" : "Select coach & date first"} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {selectedCoach && bookingDate ? (
-                          getAvailableTimesForDate(bookingDate).length > 0 ? (
-                            getAvailableTimesForDate(bookingDate).map((t) => (
-                              <SelectItem key={t} value={t}>{t}</SelectItem>
-                            ))
-                          ) : (
-                            <div className="p-2 text-sm text-muted-foreground">
-                              No available slots on this day
-                            </div>
-                          )
-                        ) : (
-                          timeSlots.map((t) => (
-                            <SelectItem key={t} value={t}>{t}</SelectItem>
-                          ))
-                        )}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Notes */}
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Notes (optional)</label>
-                    <Textarea
-                      placeholder="Any topics you'd like to focus on..."
-                      value={bookingNotes}
-                      onChange={(e) => setBookingNotes(e.target.value)}
-                      rows={2}
-                    />
-                  </div>
-
-                  <Button 
-                    onClick={submitBookingRequest} 
-                    disabled={saving || !selectedCoach || !bookingDate || !bookingTime} 
-                    className="w-full"
-                  >
-                    {saving ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Submitting...
-                      </>
-                    ) : (
-                      <>
-                        <Video className="w-4 h-4 mr-2" />
-                        Request Session
-                      </>
-                    )}
-                  </Button>
-                  
-                  <p className="text-xs text-muted-foreground text-center">
-                    Your coach will review and confirm the session
-                  </p>
-                </div>
-              </DialogContent>
-            </Dialog>
-          )}
-
-          {isStudent && assignedCoaches.length === 0 && (
-            <Button
-              variant="outline"
-              className="gap-2"
-              onClick={() => toast.info("A coach will be assigned to you soon. Please check back later!")}
-            >
+          {isStudent && (
+            <Button className="gap-2" onClick={() => setShowScheduleDialog(true)}>
               <Plus className="w-4 h-4" />
               Book Session
             </Button>
           )}
         </div>
       </div>
+
+      {/* Direct Booking Dialog - Works for all students */}
+      <Dialog open={showScheduleDialog} onOpenChange={setShowScheduleDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Video className="w-5 h-5 text-primary" />
+              Book a Session
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            {/* Coach Selection - Optional if coaches are assigned */}
+            {assignedCoaches.length > 0 && (
+              <div>
+                <label className="text-sm font-medium mb-2 block flex items-center gap-2">
+                  <User className="w-4 h-4 text-primary" />
+                  Select Coach (optional)
+                </label>
+                <Select value={selectedCoach} onValueChange={setSelectedCoach}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Admin will assign a coach" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {assignedCoaches.map((coach) => (
+                      <SelectItem key={coach.coach_id} value={coach.coach_id}>
+                        {coach.display_name || "Coach"}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {/* Date Selection */}
+            <div>
+              <label className="text-sm font-medium mb-2 block flex items-center gap-2">
+                <CalendarIcon className="w-4 h-4 text-primary" />
+                Select Date
+              </label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="w-full justify-start">
+                    <CalendarIcon className="w-4 h-4 mr-2" />
+                    {bookingDate ? format(bookingDate, "EEE, MMM d, yyyy") : "Pick a date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={bookingDate}
+                    onSelect={setBookingDate}
+                    disabled={(date) => isBefore(date, startOfToday())}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            {/* Time Selection */}
+            <div>
+              <label className="text-sm font-medium mb-2 block flex items-center gap-2">
+                <Clock className="w-4 h-4 text-primary" />
+                Select Time
+              </label>
+              <Select 
+                value={bookingTime} 
+                onValueChange={setBookingTime}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Choose time" />
+                </SelectTrigger>
+                <SelectContent>
+                  {timeSlots.map((t) => (
+                    <SelectItem key={t} value={t}>{t}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Notes */}
+            <div>
+              <label className="text-sm font-medium mb-2 block">Notes (optional)</label>
+              <Textarea
+                placeholder="Any topics you'd like to focus on..."
+                value={bookingNotes}
+                onChange={(e) => setBookingNotes(e.target.value)}
+                rows={2}
+              />
+            </div>
+
+            <Button 
+              onClick={submitBookingRequest} 
+              disabled={saving || !bookingDate || !bookingTime} 
+              className="w-full"
+            >
+              {saving ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Submitting...
+                </>
+              ) : (
+                <>
+                  <Video className="w-4 h-4 mr-2" />
+                  Request Session
+                </>
+              )}
+            </Button>
+            
+            <p className="text-xs text-muted-foreground text-center">
+              {assignedCoaches.length > 0 
+                ? "Your coach will review and confirm the session"
+                : "Admin will assign a coach and confirm your session"
+              }
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Status Legend */}
       <div className="flex flex-wrap items-center gap-2 sm:gap-3">

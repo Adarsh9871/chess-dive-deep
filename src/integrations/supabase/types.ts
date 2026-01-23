@@ -405,7 +405,7 @@ export type Database = {
       slot_requests: {
         Row: {
           admin_notes: string | null
-          coach_id: string
+          coach_id: string | null
           created_at: string
           id: string
           notes: string | null
@@ -417,7 +417,7 @@ export type Database = {
         }
         Insert: {
           admin_notes?: string | null
-          coach_id: string
+          coach_id?: string | null
           created_at?: string
           id?: string
           notes?: string | null
@@ -429,7 +429,7 @@ export type Database = {
         }
         Update: {
           admin_notes?: string | null
-          coach_id?: string
+          coach_id?: string | null
           created_at?: string
           id?: string
           notes?: string | null
