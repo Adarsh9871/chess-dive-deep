@@ -71,13 +71,13 @@ const GameInfo = ({
   const scoreDiff = whiteScore - blackScore;
 
   return (
-    <div className="bg-card rounded-2xl p-6 shadow-lg space-y-6">
+    <div className="bg-card rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg space-y-4 sm:space-y-6">
       {/* Bot Info */}
-      <div className="flex items-center gap-4 pb-4 border-b border-border">
-        <span className="text-4xl">{bot?.emoji}</span>
+      <div className="flex items-center gap-3 sm:gap-4 pb-3 sm:pb-4 border-b border-border">
+        <span className="text-3xl sm:text-4xl">{bot?.emoji}</span>
         <div>
-          <h3 className="font-display font-bold text-lg">{bot?.name}</h3>
-          <p className="text-sm text-muted-foreground capitalize">
+          <h3 className="font-display font-bold text-base sm:text-lg">{bot?.name}</h3>
+          <p className="text-xs sm:text-sm text-muted-foreground capitalize">
             {botDifficulty} difficulty
           </p>
         </div>
@@ -86,7 +86,7 @@ const GameInfo = ({
       {/* Game Status */}
       <motion.div
         key={status.text}
-        className={`p-4 rounded-xl text-center font-display font-bold ${
+        className={`p-3 sm:p-4 rounded-lg sm:rounded-xl text-center font-display font-bold text-sm sm:text-base ${
           status.type === "end"
             ? "bg-gold/20 text-gold-dark"
             : status.type === "check"
@@ -104,12 +104,12 @@ const GameInfo = ({
 
       {/* Captured Pieces */}
       <div className="space-y-2">
-        <h4 className="font-display font-semibold text-sm text-muted-foreground">
+        <h4 className="font-display font-semibold text-xs sm:text-sm text-muted-foreground">
           Captured Pieces
         </h4>
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-1">
-            <span className="text-2xl">
+            <span className="text-xl sm:text-2xl">
               {capturedPieces.black.map((p, i) => (
                 <span key={i} className="text-foreground">
                   {
@@ -125,18 +125,18 @@ const GameInfo = ({
               ))}
             </span>
             {scoreDiff < 0 && (
-              <span className="text-sm font-bold text-secondary">
+              <span className="text-xs sm:text-sm font-bold text-secondary">
                 +{Math.abs(scoreDiff)}
               </span>
             )}
           </div>
           <div className="flex items-center gap-1">
             {scoreDiff > 0 && (
-              <span className="text-sm font-bold text-secondary">
+              <span className="text-xs sm:text-sm font-bold text-secondary">
                 +{scoreDiff}
               </span>
             )}
-            <span className="text-2xl">
+            <span className="text-xl sm:text-2xl">
               {capturedPieces.white.map((p, i) => (
                 <span
                   key={i}
@@ -161,16 +161,16 @@ const GameInfo = ({
 
       {/* Move History */}
       <div className="space-y-2">
-        <h4 className="font-display font-semibold text-sm text-muted-foreground">
+        <h4 className="font-display font-semibold text-xs sm:text-sm text-muted-foreground">
           Move History
         </h4>
-        <div className="bg-muted rounded-xl p-3 max-h-32 overflow-y-auto">
+        <div className="bg-muted rounded-lg sm:rounded-xl p-2 sm:p-3 max-h-24 sm:max-h-32 overflow-y-auto">
           {moveHistory.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center">
+            <p className="text-xs sm:text-sm text-muted-foreground text-center">
               No moves yet
             </p>
           ) : (
-            <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm font-mono">
+            <div className="grid grid-cols-2 gap-x-3 sm:gap-x-4 gap-y-0.5 sm:gap-y-1 text-xs sm:text-sm font-mono">
               {moveHistory.map((move, index) => (
                 <span
                   key={index}
@@ -190,24 +190,24 @@ const GameInfo = ({
       </div>
 
       {/* Actions */}
-      <div className="flex gap-3 pt-4 border-t border-border">
+      <div className="flex gap-2 sm:gap-3 pt-3 sm:pt-4 border-t border-border">
         {!isGameOver ? (
           <Button
             variant="outline"
-            className="flex-1"
+            className="flex-1 text-xs sm:text-sm h-9 sm:h-10"
             onClick={onResign}
             disabled={isThinking}
           >
-            <Flag className="w-4 h-4 mr-2" />
+            <Flag className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
             Resign
           </Button>
         ) : (
-          <Button variant="default" className="flex-1" onClick={onNewGame}>
-            <Trophy className="w-4 h-4 mr-2" />
+          <Button variant="default" className="flex-1 text-xs sm:text-sm h-9 sm:h-10" onClick={onNewGame}>
+            <Trophy className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
             Play Again
           </Button>
         )}
-        <Button variant="secondary" className="flex-1" onClick={onNewGame}>
+        <Button variant="secondary" className="flex-1 text-xs sm:text-sm h-9 sm:h-10" onClick={onNewGame}>
           New Game
         </Button>
       </div>

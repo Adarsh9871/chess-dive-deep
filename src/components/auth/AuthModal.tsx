@@ -1,25 +1,53 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Mail, Lock, User, Loader2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: () => void;
+  redirectAfterAuth?: boolean;
 }
 
-const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
+const AuthModal = ({ isOpen, onClose, onSuccess, redirectAfterAuth = true }: AuthModalProps) => {
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { signIn, signUp } = useAuth();
+  const navigate = useNavigate();
+
+  const checkUserRoleAndRedirect = async (userId: string) => {
+    if (!redirectAfterAuth) return;
+    
+    const { data: roles } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId);
+
+    if (roles && roles.length > 0) {
+      const isAdmin = roles.some(r => r.role === 'admin');
+      const isCoach = roles.some(r => r.role === 'coach');
+      
+      if (isAdmin) {
+        navigate("/admin");
+      } else if (isCoach) {
+        navigate("/dashboard");
+      } else {
+        navigate("/dashboard");
+      }
+    } else {
+      navigate("/dashboard");
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,9 +67,15 @@ const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
           onSuccess?.();
           onClose();
           resetForm();
+          
+          // Get user and redirect based on role
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user) {
+            await checkUserRoleAndRedirect(user.id);
+          }
         }
       } else {
-        const { error } = await signUp(email, password, username);
+        const { data, error } = await signUp(email, password, username);
         if (error) {
           toast.error(error.message || "Signup failed");
         } else {
@@ -49,6 +83,11 @@ const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
           onSuccess?.();
           onClose();
           resetForm();
+          
+          // Redirect new users to dashboard
+          if (data?.user && redirectAfterAuth) {
+            navigate("/dashboard");
+          }
         }
       }
     } catch (err) {

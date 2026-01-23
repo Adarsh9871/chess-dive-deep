@@ -15,6 +15,7 @@ import {
   Clock,
   GraduationCap,
   ClipboardList,
+  BookOpen,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,12 +25,14 @@ import MakeupClassTab from "@/components/dashboard/MakeupClassTab";
 import CoachAvailabilityTab from "@/components/coach/CoachAvailabilityTab";
 import MyStudentsTab from "@/components/coach/MyStudentsTab";
 import CoachSlotRequestsTab from "@/components/coach/CoachSlotRequestsTab";
+import StudentSlotBookingTab from "@/components/dashboard/StudentSlotBookingTab";
 
 const CoachDashboard = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [isAdmin, setIsAdmin] = useState(false);
   const [isCoach, setIsCoach] = useState(false);
+  const [isStudent, setIsStudent] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [pendingRequests, setPendingRequests] = useState(0);
 
@@ -55,6 +58,10 @@ const CoachDashboard = () => {
     if (roles) {
       setIsAdmin(roles.some(r => r.role === 'admin'));
       setIsCoach(roles.some(r => r.role === 'coach'));
+      setIsStudent(roles.some(r => r.role === 'student') || roles.length === 0);
+    } else {
+      // Default to student if no roles
+      setIsStudent(true);
     }
   };
 
@@ -89,7 +96,7 @@ const CoachDashboard = () => {
       <Header />
 
       <div className="bg-background border-b pt-20">
-        <div className="container px-4 mx-auto py-4 flex items-center justify-between">
+        <div className="container px-4 mx-auto py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
               <LayoutDashboard className="w-5 h-5 text-primary" />
@@ -101,18 +108,18 @@ const CoachDashboard = () => {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             {isAdmin && (
               <Link to="/admin">
                 <Button variant="outline" size="sm" className="gap-2">
                   <Shield className="w-4 h-4" />
-                  Admin Panel
+                  <span className="hidden sm:inline">Admin Panel</span>
                 </Button>
               </Link>
             )}
             <Button variant="destructive" size="sm" onClick={signOut}>
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
+              <LogOut className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Logout</span>
             </Button>
           </div>
         </div>
@@ -123,22 +130,30 @@ const CoachDashboard = () => {
           <TabsList className="bg-background border h-auto p-1 flex flex-wrap gap-1">
             <TabsTrigger value="calendar" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center gap-2">
               <Calendar className="w-4 h-4" />
-              Calendar
+              <span className="hidden sm:inline">Calendar</span>
             </TabsTrigger>
+            
+            {/* Student booking tab */}
+            {(isStudent || (!isCoach && !isAdmin)) && (
+              <TabsTrigger value="booking" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center gap-2">
+                <BookOpen className="w-4 h-4" />
+                <span className="hidden sm:inline">Book Session</span>
+              </TabsTrigger>
+            )}
             
             {isCoach && (
               <>
                 <TabsTrigger value="availability" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center gap-2">
                   <Clock className="w-4 h-4" />
-                  Availability
+                  <span className="hidden sm:inline">Availability</span>
                 </TabsTrigger>
                 <TabsTrigger value="students" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center gap-2">
                   <GraduationCap className="w-4 h-4" />
-                  My Students
+                  <span className="hidden sm:inline">My Students</span>
                 </TabsTrigger>
                 <TabsTrigger value="requests" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center gap-2 relative">
                   <ClipboardList className="w-4 h-4" />
-                  Requests
+                  <span className="hidden sm:inline">Requests</span>
                   {pendingRequests > 0 && (
                     <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center text-xs">
                       {pendingRequests}
@@ -150,7 +165,7 @@ const CoachDashboard = () => {
 
             <TabsTrigger value="messages" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center gap-2 relative">
               <MessageSquare className="w-4 h-4" />
-              Messages
+              <span className="hidden sm:inline">Messages</span>
               {unreadCount > 0 && (
                 <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center text-xs">
                   {unreadCount}
@@ -159,13 +174,19 @@ const CoachDashboard = () => {
             </TabsTrigger>
             <TabsTrigger value="makeup" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center gap-2">
               <RefreshCw className="w-4 h-4" />
-              Makeup Class
+              <span className="hidden sm:inline">Makeup</span>
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="calendar">
             <CalendarTab />
           </TabsContent>
+
+          {(isStudent || (!isCoach && !isAdmin)) && (
+            <TabsContent value="booking">
+              <StudentSlotBookingTab />
+            </TabsContent>
+          )}
 
           {isCoach && (
             <>
