@@ -83,16 +83,17 @@ const PremiumBotSelector = ({ selectedDifficulty, onSelect }: PremiumBotSelector
         </p>
       </motion.div>
 
-      {/* Bot grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 px-2 sm:px-0">
+      {/* Bot grid - all cards in single row on desktop */}
+      <div className="flex flex-wrap justify-center gap-3 sm:gap-4 px-2 sm:px-0">
         {premiumBots.map((bot, index) => (
-          <PremiumBotCard
-            key={bot.id}
-            bot={bot}
-            isSelected={selectedDifficulty === bot.id}
-            onSelect={() => onSelect(bot.id)}
-            index={index}
-          />
+          <div key={bot.id} className="w-[calc(50%-0.5rem)] sm:w-[180px] md:w-[170px] lg:w-[180px] xl:w-[190px]">
+            <PremiumBotCard
+              bot={bot}
+              isSelected={selectedDifficulty === bot.id}
+              onSelect={() => onSelect(bot.id)}
+              index={index}
+            />
+          </div>
         ))}
       </div>
 

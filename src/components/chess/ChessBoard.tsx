@@ -167,9 +167,9 @@ const ChessBoard = memo(({
   const displayFiles = isFlipped ? [...files].reverse() : files;
 
   return (
-    <div className="relative w-full max-w-[min(85vw,420px)] sm:max-w-[450px] mx-auto">
+    <div className="relative w-full max-w-[min(92vw,400px)] sm:max-w-[480px] md:max-w-[520px] mx-auto">
       {/* Board shadow and frame */}
-      <div className="rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl border-4 border-amber-900/30 bg-amber-900/20">
+      <div className="rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl border-4 sm:border-[6px] border-amber-800/40 bg-gradient-to-br from-amber-900/30 to-amber-950/40">
         {/* Inner board */}
         <div className="relative">
           {displayRanks.map((rank, rankIndex) => (
@@ -234,19 +234,17 @@ const ChessBoard = memo(({
                           exit={{ scale: 0.5, opacity: 0 }}
                           transition={{ type: "spring", stiffness: 400, damping: 20 }}
                           className={`
-                            text-[clamp(1.8rem,9vw,3.5rem)] sm:text-5xl md:text-6xl 
+                            text-[clamp(2.2rem,10vw,3.8rem)] sm:text-5xl md:text-[3.5rem] 
                             select-none cursor-grab active:cursor-grabbing
-                            drop-shadow-lg
-                            ${piece.color === "w" 
-                              ? "text-white" 
-                              : "text-gray-900"
-                            }
+                            font-bold leading-none
                           `}
                           style={{
+                            color: piece.color === "w" ? "#FFFEF0" : "#1a1a1a",
+                            WebkitTextStroke: piece.color === "w" ? "1.5px #333" : "1px #666",
                             textShadow: piece.color === "w"
-                              ? "2px 2px 4px rgba(0,0,0,0.5), -1px -1px 2px rgba(0,0,0,0.3), 0 0 8px rgba(0,0,0,0.2)"
-                              : "1px 1px 3px rgba(255,255,255,0.3), 0 0 6px rgba(0,0,0,0.3)",
-                            filter: selectedSquare === square ? "brightness(1.1)" : undefined,
+                              ? "3px 3px 6px rgba(0,0,0,0.6), -1px -1px 2px rgba(0,0,0,0.4), 0 0 12px rgba(0,0,0,0.3)"
+                              : "2px 2px 4px rgba(0,0,0,0.4), 0 0 8px rgba(255,255,255,0.2)",
+                            filter: selectedSquare === square ? "brightness(1.15) drop-shadow(0 0 8px rgba(255,215,0,0.6))" : "drop-shadow(2px 2px 3px rgba(0,0,0,0.3))",
                           }}
                         >
                           {pieceSymbols[`${piece.color}${piece.type}`]}
