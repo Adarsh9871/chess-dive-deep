@@ -26,17 +26,17 @@ const PremiumBotCard = ({ bot, isSelected, onSelect, index }: PremiumBotCardProp
   return (
     <motion.button
       className={`
-        relative w-full p-5 rounded-3xl text-left transition-all duration-300 overflow-hidden
+        relative w-full h-full min-h-[200px] p-3 sm:p-4 rounded-2xl sm:rounded-3xl text-left transition-all duration-300 overflow-hidden
         ${isSelected 
-          ? `${bot.gradient} text-white shadow-2xl ring-4 ring-gold/50 scale-[1.02]` 
-          : "bg-card hover:bg-muted/80 shadow-lg hover:shadow-xl border-2 border-transparent hover:border-primary/20"
+          ? `${bot.gradient} text-white shadow-2xl ring-4 ring-amber-400/60 scale-[1.02]` 
+          : "bg-card hover:bg-muted/80 shadow-lg hover:shadow-xl border-2 border-muted hover:border-primary/30"
         }
       `}
       onClick={onSelect}
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1, type: "spring", stiffness: 300 }}
-      whileHover={{ scale: isSelected ? 1.02 : 1.05, y: -4 }}
+      transition={{ delay: index * 0.08, type: "spring", stiffness: 300 }}
+      whileHover={{ scale: isSelected ? 1.02 : 1.04, y: -3 }}
       whileTap={{ scale: 0.98 }}
     >
       {/* Background decoration */}
@@ -72,13 +72,13 @@ const PremiumBotCard = ({ bot, isSelected, onSelect, index }: PremiumBotCardProp
         </motion.div>
       )}
 
-      <div className="relative flex flex-col items-center text-center gap-3">
+      <div className="relative flex flex-col items-center text-center gap-2 sm:gap-3">
         {/* Animated emoji */}
         <motion.div
-          className={`text-5xl sm:text-6xl ${isSelected ? "drop-shadow-lg" : ""}`}
+          className={`text-4xl sm:text-5xl ${isSelected ? "drop-shadow-lg" : ""}`}
           animate={{ 
-            y: [0, -6, 0],
-            rotate: [0, -3, 3, 0]
+            y: [0, -4, 0],
+            rotate: [0, -2, 2, 0]
           }}
           transition={{ 
             duration: 3,
@@ -92,7 +92,7 @@ const PremiumBotCard = ({ bot, isSelected, onSelect, index }: PremiumBotCardProp
 
         {/* Name */}
         <div>
-          <h3 className={`font-display font-bold text-lg sm:text-xl ${
+          <h3 className={`font-display font-bold text-sm sm:text-base ${
             isSelected ? "text-white" : "text-foreground"
           }`}>
             {bot.name}
@@ -101,26 +101,26 @@ const PremiumBotCard = ({ bot, isSelected, onSelect, index }: PremiumBotCardProp
           {/* Rating badge */}
           <Badge
             variant="outline"
-            className={`mt-1.5 text-xs font-semibold ${
+            className={`mt-1 text-[10px] sm:text-xs font-semibold ${
               isSelected 
                 ? "border-white/40 text-white/90 bg-white/10" 
                 : "border-primary/30 text-primary bg-primary/5"
             }`}
           >
-            <Star className="w-3 h-3 mr-1 fill-current" />
+            <Star className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 fill-current" />
             ELO {bot.rating}
           </Badge>
         </div>
 
         {/* Personality tag */}
-        <p className={`text-xs sm:text-sm font-medium ${
+        <p className={`text-[10px] sm:text-xs font-medium line-clamp-1 ${
           isSelected ? "text-white/80" : "text-muted-foreground"
         }`}>
           "{bot.personality}"
         </p>
 
         {/* Description */}
-        <p className={`text-xs ${
+        <p className={`text-[10px] sm:text-xs line-clamp-2 ${
           isSelected ? "text-white/70" : "text-muted-foreground/80"
         }`}>
           {bot.description}
