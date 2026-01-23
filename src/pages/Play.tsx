@@ -192,7 +192,12 @@ const Play = () => {
 
           if (newGame.inCheck()) {
             setTimeout(() => playSound("check"), 50);
-            setVoiceMessage("Your King is in check! Find a safe move!");
+            const checkMessages = [
+              "Oh no! Your King is in check! Quick, find a safe spot!",
+              "Watch out! The King needs to move to safety!",
+              "Check! Time to protect your King, you can do it!"
+            ];
+            setVoiceMessage(checkMessages[Math.floor(Math.random() * checkMessages.length)]);
           }
 
           setGame(newGame);
@@ -204,13 +209,19 @@ const Play = () => {
             const winner = newGame.turn() === playerColor ? "Bot" : "You";
             const message = newGame.isCheckmate()
               ? winner === "You"
-                ? "🎉 Congratulations! You won!"
-                : "Good game! Try again!"
-              : "It's a draw!";
+                ? "Wow! Amazing job! You are a chess champion!"
+                : "Great game! Every chess master learns from mistakes. Try again!"
+              : "It's a draw! That means you played really well!";
             toast[winner === "You" ? "success" : "info"](message);
             setVoiceMessage(message);
           } else {
-            setVoiceMessage("Your turn! Look at the suggested moves and pick the best one!");
+            const turnMessages = [
+              "Your turn now! Look at the green arrows for help!",
+              "Great! Now it's your move. What do you see?",
+              "Alright! Think carefully and make your best move!",
+              "Your turn! Remember, take your time and have fun!"
+            ];
+            setVoiceMessage(turnMessages[Math.floor(Math.random() * turnMessages.length)]);
           }
         })
         .catch((error) => {
@@ -255,14 +266,24 @@ const Play = () => {
             ],
           }));
           playSound("capture");
-          setVoiceMessage(`Great capture! You took their ${move.captured === 'q' ? 'Queen' : move.captured === 'r' ? 'Rook' : move.captured === 'b' ? 'Bishop' : move.captured === 'n' ? 'Knight' : 'Pawn'}!`);
+          const captureMessages = [
+            `Awesome capture! You got their ${move.captured === 'q' ? 'Queen' : move.captured === 'r' ? 'Rook' : move.captured === 'b' ? 'Bishop' : move.captured === 'n' ? 'Knight' : 'Pawn'}!`,
+            `Great job! That ${move.captured === 'q' ? 'Queen' : move.captured === 'r' ? 'Rook' : move.captured === 'b' ? 'Bishop' : move.captured === 'n' ? 'Knight' : 'Pawn'} is yours now!`,
+            `Boom! Nice capture! You're playing like a pro!`
+          ];
+          setVoiceMessage(captureMessages[Math.floor(Math.random() * captureMessages.length)]);
         } else {
           playSound("move");
         }
 
         if (newGame.inCheck()) {
           playSound("check");
-          setVoiceMessage("Check! You're attacking the enemy King!");
+          const checkMessages = [
+            "Check! You're attacking the King! Great move!",
+            "Whoa! Check! The King is in trouble!",
+            "Amazing! That's check! You're doing great!"
+          ];
+          setVoiceMessage(checkMessages[Math.floor(Math.random() * checkMessages.length)]);
         }
 
         setGameHistory((prev) => [...prev, game.fen()]);
@@ -273,7 +294,9 @@ const Play = () => {
 
         if (newGame.isGameOver()) {
           playSound("gameEnd");
-          const message = newGame.isCheckmate() ? "🎉 Checkmate! You won!" : "It's a draw!";
+          const message = newGame.isCheckmate() 
+            ? "Checkmate! You are amazing! You won the game!" 
+            : "It's a draw! Great defensive play!";
           toast[newGame.isCheckmate() ? "success" : "info"](message);
           setVoiceMessage(message);
         }
@@ -305,7 +328,12 @@ const Play = () => {
   const startGameNow = useCallback(() => {
     const bot = premiumBots.find((b) => b.id === botDifficulty);
     setGamePhase("playing");
-    setVoiceMessage(`Game started against ${bot?.name}! You're playing as white. Make your first move!`);
+    const startMessages = [
+      `Let's play chess with ${bot?.name}! You're white, so you go first. Have fun!`,
+      `Awesome! Time to play against ${bot?.name}! Make your first move!`,
+      `Here we go! ${bot?.name} is ready. You play as white. Good luck, champion!`
+    ];
+    setVoiceMessage(startMessages[Math.floor(Math.random() * startMessages.length)]);
     toast.success(`Game started against ${bot?.name}!`);
   }, [botDifficulty]);
 
