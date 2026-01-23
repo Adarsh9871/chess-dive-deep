@@ -142,22 +142,22 @@ const ChessBoard = memo(({
   const getSquareClasses = useCallback((square: Square, fileIdx: number, rankIdx: number): string => {
     const isLight = (fileIdx + rankIdx) % 2 === 0;
     
-    // Premium wood-like colors
-    const lightColor = "bg-[#f0d9b5]"; // Light wood
-    const darkColor = "bg-[#b58863]"; // Dark wood
+    // Bright colorful board - light cream and soft teal/green
+    const lightColor = "bg-[#FFFBEB]"; // Warm cream
+    const darkColor = "bg-[#86EFAC]"; // Bright mint green
     const baseColor = isLight ? lightColor : darkColor;
     
     let highlight = "";
     if (highlightedSquares?.from === square) {
-      highlight = "ring-2 ring-emerald-400/70 ring-inset bg-emerald-400/30";
+      highlight = "ring-3 ring-cyan-400 ring-inset bg-cyan-300/50";
     } else if (highlightedSquares?.to === square) {
-      highlight = "ring-2 ring-amber-400/70 ring-inset bg-amber-400/30";
+      highlight = "ring-3 ring-amber-400 ring-inset bg-amber-300/50";
     } else if (selectedSquare === square) {
-      highlight = "ring-4 ring-primary ring-inset bg-primary/30";
+      highlight = "ring-4 ring-yellow-400 ring-inset bg-yellow-300/60";
     } else if (lastMove && (lastMove.from === square || lastMove.to === square)) {
-      highlight = isLight ? "bg-[#cdd26a]" : "bg-[#aaa23a]"; // Yellow-green highlight
+      highlight = isLight ? "bg-[#FDE68A]" : "bg-[#A7F3D0]"; // Yellow/mint highlight
     } else if (kingInCheckSquare === square) {
-      highlight = "bg-red-500/60";
+      highlight = "bg-red-400/70 ring-2 ring-red-500";
     }
 
     return `${baseColor} ${highlight}`;
@@ -168,10 +168,10 @@ const ChessBoard = memo(({
 
   return (
     <div className="relative w-full max-w-[min(92vw,400px)] sm:max-w-[480px] md:max-w-[520px] mx-auto">
-      {/* Board shadow and frame */}
-      <div className="rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl border-4 sm:border-[6px] border-amber-800/40 bg-gradient-to-br from-amber-900/30 to-amber-950/40">
-        {/* Inner board */}
-        <div className="relative">
+      {/* Board shadow and frame - colorful gradient border */}
+      <div className="rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl border-4 sm:border-6 border-transparent bg-gradient-to-br from-emerald-500 via-teal-400 to-cyan-500 p-1">
+        {/* Inner board with rounded corners */}
+        <div className="relative rounded-xl sm:rounded-2xl overflow-hidden bg-white">
           {displayRanks.map((rank, rankIndex) => (
             <div key={rank} className="flex">
               {displayFiles.map((file, fileIndex) => {
@@ -234,17 +234,19 @@ const ChessBoard = memo(({
                           exit={{ scale: 0.5, opacity: 0 }}
                           transition={{ type: "spring", stiffness: 400, damping: 20 }}
                           className={`
-                            text-[clamp(2.2rem,10vw,3.8rem)] sm:text-5xl md:text-[3.5rem] 
+                            text-[clamp(2.5rem,11vw,4rem)] sm:text-[3.5rem] md:text-[4rem] 
                             select-none cursor-grab active:cursor-grabbing
-                            font-bold leading-none
+                            font-bold leading-none transition-transform
                           `}
                           style={{
-                            color: piece.color === "w" ? "#FFFEF0" : "#1a1a1a",
-                            WebkitTextStroke: piece.color === "w" ? "1.5px #333" : "1px #666",
+                            color: piece.color === "w" ? "#FFF8DC" : "#1E3A5F",
+                            WebkitTextStroke: piece.color === "w" ? "2px #8B4513" : "1.5px #0F172A",
                             textShadow: piece.color === "w"
-                              ? "3px 3px 6px rgba(0,0,0,0.6), -1px -1px 2px rgba(0,0,0,0.4), 0 0 12px rgba(0,0,0,0.3)"
-                              : "2px 2px 4px rgba(0,0,0,0.4), 0 0 8px rgba(255,255,255,0.2)",
-                            filter: selectedSquare === square ? "brightness(1.15) drop-shadow(0 0 8px rgba(255,215,0,0.6))" : "drop-shadow(2px 2px 3px rgba(0,0,0,0.3))",
+                              ? "3px 3px 0 #D2691E, 4px 4px 8px rgba(0,0,0,0.5), 0 0 20px rgba(255,215,0,0.3)"
+                              : "2px 2px 0 #1E293B, 3px 3px 6px rgba(0,0,0,0.4), 0 0 15px rgba(30,58,95,0.4)",
+                            filter: selectedSquare === square 
+                              ? "brightness(1.2) drop-shadow(0 0 12px rgba(255,215,0,0.8))" 
+                              : "drop-shadow(3px 3px 4px rgba(0,0,0,0.4))",
                           }}
                         >
                           {pieceSymbols[`${piece.color}${piece.type}`]}
