@@ -22,6 +22,7 @@ import {
   Clock,
   RefreshCw,
   Gamepad2,
+  UserPlus,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -32,6 +33,7 @@ import CoachAssignmentTab from "@/components/admin/CoachAssignmentTab";
 import SlotRequestsTab from "@/components/admin/SlotRequestsTab";
 import MakeupRequestsAdminTab from "@/components/admin/MakeupRequestsAdminTab";
 import ScheduledGamesAdminTab from "@/components/admin/ScheduledGamesAdminTab";
+import CreateCoachTab from "@/components/admin/CreateCoachTab";
 
 type UserRole = "admin" | "coach" | "student";
 
@@ -315,6 +317,10 @@ const AdminPanel = () => {
               <Gamepad2 className="w-4 h-4" />
               <span className="hidden sm:inline">Games</span>
             </TabsTrigger>
+            <TabsTrigger value="create-coach" className="gap-2">
+              <UserPlus className="w-4 h-4" />
+              <span className="hidden sm:inline">Create Coach</span>
+            </TabsTrigger>
             <TabsTrigger value="users" className="gap-2">
               <Users className="w-4 h-4" />
               <span className="hidden sm:inline">Users</span>
@@ -351,6 +357,11 @@ const AdminPanel = () => {
           {/* Scheduled Games Tab */}
           <TabsContent value="games">
             <ScheduledGamesAdminTab />
+          </TabsContent>
+
+          {/* Create Coach Tab */}
+          <TabsContent value="create-coach">
+            <CreateCoachTab />
           </TabsContent>
 
           {/* Users Tab */}
