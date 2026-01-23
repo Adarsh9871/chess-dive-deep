@@ -24,6 +24,16 @@ interface ClassEvent {
   duration_minutes: number;
 }
 
+interface SlotRequest {
+  id: string;
+  student_id: string;
+  coach_id: string | null;
+  requested_date: string;
+  requested_time: string;
+  status: string;
+  notes: string | null;
+}
+
 interface CoachInfo {
   coach_id: string;
   display_name: string | null;
@@ -53,6 +63,12 @@ const statusColors: Record<string, string> = {
   trial: "bg-purple-400",
 };
 
+const bookingStatusColors: Record<string, string> = {
+  pending: "bg-amber-500",
+  approved: "bg-green-500",
+  rejected: "bg-red-400",
+};
+
 const CalendarTab = () => {
   const { user } = useAuth();
   const [currentWeek, setCurrentWeek] = useState(new Date());
@@ -61,6 +77,7 @@ const CalendarTab = () => {
   const [showBookingDialog, setShowBookingDialog] = useState(false);
   const [assignedCoaches, setAssignedCoaches] = useState<CoachInfo[]>([]);
   const [coachAvailability, setCoachAvailability] = useState<AvailabilitySlot[]>([]);
+  const [slotRequests, setSlotRequests] = useState<SlotRequest[]>([]);
   const [isStudent, setIsStudent] = useState(false);
   const [isCoach, setIsCoach] = useState(false);
   
@@ -79,6 +96,7 @@ const CalendarTab = () => {
       checkUserRole();
       fetchClasses();
       fetchAssignedCoaches();
+      fetchSlotRequests();
     }
   }, [user, currentWeek]);
 
@@ -155,6 +173,22 @@ const CalendarTab = () => {
     setLoading(false);
   };
 
+  const fetchSlotRequests = async () => {
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from("slot_requests")
+      .select("*")
+      .eq("student_id", user.id)
+      .order("requested_date", { ascending: true });
+
+    if (error) {
+      console.error("Error fetching slot requests:", error);
+    } else {
+      setSlotRequests(data || []);
+    }
+  };
+
   const getAvailableTimesForDate = (date: Date) => {
     if (!selectedCoach || !date) return [];
     
@@ -217,12 +251,15 @@ const CalendarTab = () => {
     }
     
     setSaving(false);
-    toast.success("Booking request submitted! Your coach will review it.");
+    toast.success("Booking request submitted! Admin will assign a coach.");
     setShowBookingDialog(false);
+    setShowScheduleDialog(false);
     setSelectedCoach("");
     setBookingDate(undefined);
     setBookingTime("");
     setBookingNotes("");
+    fetchSlotRequests();
+  };
   };
 
   const updateClassStatus = async (classId: string, newStatus: string) => {
@@ -245,6 +282,14 @@ const CalendarTab = () => {
       (c) =>
         isSameDay(new Date(c.scheduled_date), day) &&
         c.scheduled_time === time
+    );
+  };
+
+  const getBookingsForSlot = (day: Date, time: string) => {
+    return slotRequests.filter(
+      (r) =>
+        isSameDay(new Date(r.requested_date), day) &&
+        r.requested_time === time
     );
   };
 
@@ -406,6 +451,13 @@ const CalendarTab = () => {
             <span className="text-xs capitalize">{status}</span>
           </div>
         ))}
+        <div className="w-px h-4 bg-border mx-1" />
+        {Object.entries(bookingStatusColors).map(([status, color]) => (
+          <div key={status} className="flex items-center gap-1.5">
+            <div className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded ${color}`} />
+            <span className="text-xs capitalize">{status === "pending" ? "Booked" : status}</span>
+          </div>
+        ))}
       </div>
 
       {/* Week Navigation */}
@@ -460,6 +512,7 @@ const CalendarTab = () => {
                   </div>
                   {weekDays.map((day, dayIndex) => {
                     const slotClasses = getClassesForSlot(day, time);
+                    const slotBookings = getBookingsForSlot(day, time);
                     const isPast = isBefore(day, startOfToday());
                     
                     return (
@@ -489,6 +542,19 @@ const CalendarTab = () => {
                             </p>
                           </div>
                         ))}
+                        {slotBookings.map((b) => (
+                          <div
+                            key={b.id}
+                            className={`text-xs p-1 sm:p-1.5 rounded text-white mb-0.5 ${
+                              bookingStatusColors[b.status] || "bg-amber-500"
+                            }`}
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <p className="font-medium truncate text-[10px] sm:text-xs capitalize">
+                              {b.status === "pending" ? "Booked" : b.status}
+                            </p>
+                          </div>
+                        ))}
                       </div>
                     );
                   })}
@@ -499,8 +565,58 @@ const CalendarTab = () => {
         </CardContent>
       </Card>
 
+      {/* Booked Sessions List */}
+      {isStudent && slotRequests.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CalendarIcon className="w-5 h-5 text-primary" />
+              My Booked Sessions
+            </CardTitle>
+            <CardDescription>
+              Your upcoming and past booking requests
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {slotRequests.map((request) => (
+                <div
+                  key={request.id}
+                  className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-2 h-2 rounded-full ${bookingStatusColors[request.status] || "bg-gray-400"}`} />
+                    <div>
+                      <p className="font-medium text-sm">
+                        {format(new Date(request.requested_date), "EEE, MMM d, yyyy")}
+                      </p>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <Clock className="w-3 h-3" />
+                        <span>{request.requested_time}</span>
+                        {request.notes && (
+                          <>
+                            <span>•</span>
+                            <span className="truncate max-w-[150px]">{request.notes}</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <Badge 
+                    variant={request.status === "approved" ? "default" : request.status === "rejected" ? "destructive" : "secondary"}
+                    className="capitalize"
+                  >
+                    {request.status}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Info for students without coaches */}
-      {isStudent && assignedCoaches.length === 0 && (
+      {isStudent && assignedCoaches.length === 0 && slotRequests.length === 0 && (
         <Card className="border-dashed">
           <CardContent className="py-8 text-center">
             <User className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
