@@ -25,30 +25,6 @@ const AuthModal = ({ isOpen, onClose, onSuccess, redirectAfterAuth = true }: Aut
   const { signIn, signUp } = useAuth();
   const navigate = useNavigate();
 
-  const checkUserRoleAndRedirect = async (userId: string) => {
-    if (!redirectAfterAuth) return;
-    
-    const { data: roles } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId);
-
-    if (roles && roles.length > 0) {
-      const isAdmin = roles.some(r => r.role === 'admin');
-      const isCoach = roles.some(r => r.role === 'coach');
-      
-      if (isAdmin) {
-        navigate("/admin");
-      } else if (isCoach) {
-        navigate("/dashboard");
-      } else {
-        navigate("/dashboard");
-      }
-    } else {
-      navigate("/dashboard");
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
@@ -62,32 +38,56 @@ const AuthModal = ({ isOpen, onClose, onSuccess, redirectAfterAuth = true }: Aut
         const { error } = await signIn(email, password);
         if (error) {
           toast.error(error.message || "Login failed");
-        } else {
-          toast.success("Welcome back! 🎉");
-          onSuccess?.();
-          onClose();
-          resetForm();
-          
-          // Get user and redirect based on role
-          const { data: { user } } = await supabase.auth.getUser();
-          if (user) {
-            await checkUserRoleAndRedirect(user.id);
+          setIsLoading(false);
+          return;
+        }
+        
+        toast.success("Welcome back! 🎉");
+        resetForm();
+        onSuccess?.();
+        onClose();
+        
+        // Get user and redirect based on role AFTER closing modal
+        if (redirectAfterAuth) {
+          const { data: { user: authUser } } = await supabase.auth.getUser();
+          if (authUser) {
+            const { data: roles } = await supabase
+              .from("user_roles")
+              .select("role")
+              .eq("user_id", authUser.id);
+
+            if (roles && roles.length > 0) {
+              const isAdmin = roles.some(r => r.role === 'admin');
+              const isCoach = roles.some(r => r.role === 'coach');
+              
+              if (isAdmin) {
+                navigate("/admin", { replace: true });
+              } else if (isCoach) {
+                navigate("/dashboard", { replace: true });
+              } else {
+                navigate("/dashboard", { replace: true });
+              }
+            } else {
+              navigate("/dashboard", { replace: true });
+            }
           }
         }
       } else {
         const { data, error } = await signUp(email, password, username);
         if (error) {
           toast.error(error.message || "Signup failed");
-        } else {
-          toast.success("Account created! Welcome to ChessPals! 🎉");
-          onSuccess?.();
-          onClose();
-          resetForm();
-          
-          // Redirect new users to dashboard
-          if (data?.user && redirectAfterAuth) {
-            navigate("/dashboard");
-          }
+          setIsLoading(false);
+          return;
+        }
+        
+        toast.success("Account created! Welcome to ChessPals! 🎉");
+        resetForm();
+        onSuccess?.();
+        onClose();
+        
+        // Redirect new users to dashboard
+        if (data?.user && redirectAfterAuth) {
+          navigate("/dashboard", { replace: true });
         }
       }
     } catch (err) {
