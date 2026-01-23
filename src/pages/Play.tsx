@@ -716,11 +716,26 @@ const Play = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="pb-56 lg:pb-0"
+                className="pb-56 lg:pb-4"
               >
-                <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 justify-center items-center lg:items-start">
-                  {/* Main game area */}
-                  <div className="flex flex-col items-center gap-4 order-1 w-full lg:w-auto">
+                {/* 3-column layout for desktop */}
+                <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr_280px] xl:grid-cols-[300px_1fr_300px] gap-4 lg:gap-6 max-w-7xl mx-auto items-start">
+                  
+                  {/* Left panel - Game Info */}
+                  <div className="order-2 lg:order-1">
+                    <PremiumGameInfo
+                      game={game}
+                      playerColor={playerColor}
+                      botName={selectedBot?.name || "Bot"}
+                      botEmoji={selectedBot?.emoji || "🤖"}
+                      botRating={selectedBot?.rating || "~1000"}
+                      moveHistory={moveHistory}
+                      capturedPieces={capturedPieces}
+                    />
+                  </div>
+
+                  {/* Center - Main game area */}
+                  <div className="flex flex-col items-center gap-3 order-1 lg:order-2">
                     {/* Quick actions bar */}
                     <QuickActions
                       soundEnabled={soundEnabled}
@@ -748,12 +763,10 @@ const Play = () => {
                     />
 
                     {/* Voice coach */}
-                    <div className="flex items-center gap-3">
-                      <VoiceCoach
-                        message={voiceMessage}
-                        isPlayerTurn={game.turn() === playerColor && !isThinking}
-                      />
-                    </div>
+                    <VoiceCoach
+                      message={voiceMessage}
+                      isPlayerTurn={game.turn() === playerColor && !isThinking}
+                    />
 
                     {/* Chess board */}
                     <ChessBoard
@@ -770,26 +783,13 @@ const Play = () => {
                     <p className="text-sm text-muted-foreground text-center">
                       You are playing as{" "}
                       <span className="font-bold text-foreground">
-                        {playerColor === "w" ? "White ♔" : "Black ♚"}
+                        {playerColor === "w" ? "White" : "Black"}
                       </span>
                     </p>
                   </div>
 
-                  {/* Game info panel */}
-                  <div className="w-full sm:w-80 lg:w-72 xl:w-80 order-3 lg:order-2">
-                    <PremiumGameInfo
-                      game={game}
-                      playerColor={playerColor}
-                      botName={selectedBot?.name || "Bot"}
-                      botEmoji={selectedBot?.emoji || "🤖"}
-                      botRating={selectedBot?.rating || "~1000"}
-                      moveHistory={moveHistory}
-                      capturedPieces={capturedPieces}
-                    />
-                  </div>
-
-                  {/* Live guide (desktop) */}
-                  <div className="hidden lg:block order-2 lg:order-3 w-80">
+                  {/* Right panel - Live Guide */}
+                  <div className="hidden lg:block order-3">
                     <LiveGuide
                       game={game}
                       isPlayerTurn={game.turn() === playerColor && !isThinking}
