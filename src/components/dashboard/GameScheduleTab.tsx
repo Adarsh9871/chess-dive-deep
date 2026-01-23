@@ -90,6 +90,14 @@ const GameScheduleTab = () => {
     setLoading(false);
   };
 
+  // Handle calendar date click - opens dialog with date pre-selected
+  const handleDateSelect = (date: Date | undefined) => {
+    if (date && !isBefore(date, startOfToday())) {
+      setSelectedDate(date);
+      setShowScheduleDialog(true);
+    }
+  };
+
   const scheduleGame = async () => {
     if (!user || !selectedDate || !selectedTime || !selectedBot) {
       toast.error("Please fill in all fields");
@@ -150,128 +158,133 @@ const GameScheduleTab = () => {
     return format(date, "EEE, MMM d");
   };
 
+  // Get dates that have scheduled games for highlighting
+  const scheduledDates = games
+    .filter(g => g.status === "scheduled")
+    .map(g => new Date(g.scheduled_date));
+
   const upcomingGames = games.filter(g => g.status === "scheduled");
   const pastGames = games.filter(g => g.status !== "scheduled");
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-xl sm:text-2xl font-display font-bold text-foreground flex items-center gap-2">
-            <Gamepad2 className="w-6 h-6 text-primary" />
-            My Game Schedule
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Schedule chess games with bots and track your progress
+      {/* Main Calendar - Click to Schedule */}
+      <Card className="lg:col-span-2">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CalendarIcon className="w-5 h-5 text-primary" />
+            Click a Date to Schedule
+          </CardTitle>
+          <CardDescription>Select any future date to schedule a game</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Calendar
+            mode="single"
+            selected={selectedDate}
+            onSelect={handleDateSelect}
+            disabled={(date) => isBefore(date, startOfToday())}
+            className="rounded-md border p-4 w-full"
+            modifiers={{
+              scheduled: scheduledDates,
+            }}
+            modifiersStyles={{
+              scheduled: {
+                backgroundColor: "hsl(var(--primary) / 0.2)",
+                borderRadius: "50%",
+                fontWeight: "bold",
+              },
+            }}
+          />
+          <p className="text-xs text-muted-foreground mt-3 text-center">
+            💡 Click on any date to schedule a chess game
           </p>
-        </div>
+        </CardContent>
+      </Card>
 
-        <Dialog open={showScheduleDialog} onOpenChange={setShowScheduleDialog}>
-          <DialogTrigger asChild>
-            <Button className="gap-2">
-              <Plus className="w-4 h-4" />
-              Schedule Game
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <CalendarIcon className="w-5 h-5 text-primary" />
-                Schedule a Chess Game
-              </DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 pt-4">
-              {/* Bot Selection */}
-              <div>
-                <label className="text-sm font-medium mb-2 block flex items-center gap-2">
-                  <Trophy className="w-4 h-4 text-primary" />
-                  Choose Opponent
-                </label>
-                <Select value={selectedBot} onValueChange={setSelectedBot}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a bot" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {botOptions.map((bot) => (
-                      <SelectItem key={bot.id} value={bot.id}>
-                        <div className="flex items-center gap-2">
-                          <span>{bot.emoji}</span>
-                          <span>{bot.name}</span>
-                          <Badge variant="outline" className="ml-1 text-xs">
-                            ELO {bot.rating}
-                          </Badge>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Date Selection */}
-              <div>
-                <label className="text-sm font-medium mb-2 block flex items-center gap-2">
-                  <CalendarIcon className="w-4 h-4 text-primary" />
-                  Select Date
-                </label>
-                <Calendar
-                  mode="single"
-                  selected={selectedDate}
-                  onSelect={setSelectedDate}
-                  disabled={(date) => isBefore(date, startOfToday())}
-                  className="rounded-md border"
-                />
-              </div>
-
-              {/* Time Selection */}
-              <div>
-                <label className="text-sm font-medium mb-2 block flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-primary" />
-                  Select Time
-                </label>
-                <Select value={selectedTime} onValueChange={setSelectedTime}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Choose time" />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-[200px]">
-                    {timeSlots.map((time) => (
-                      <SelectItem key={time} value={time}>
-                        {time}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <Button
-                onClick={scheduleGame}
-                disabled={saving || !selectedDate || !selectedTime || !selectedBot}
-                className="w-full"
-              >
-                {saving ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Scheduling...
-                  </>
-                ) : (
-                  <>
-                    <CalendarIcon className="w-4 h-4 mr-2" />
-                    Schedule Game
-                  </>
-                )}
-              </Button>
+      {/* Schedule Dialog */}
+      <Dialog open={showScheduleDialog} onOpenChange={setShowScheduleDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CalendarIcon className="w-5 h-5 text-primary" />
+              Schedule Game for {selectedDate ? format(selectedDate, "EEEE, MMM d") : ""}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            {/* Bot Selection */}
+            <div>
+              <label className="text-sm font-medium mb-2 block flex items-center gap-2">
+                <Trophy className="w-4 h-4 text-primary" />
+                Choose Opponent
+              </label>
+              <Select value={selectedBot} onValueChange={setSelectedBot}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a bot" />
+                </SelectTrigger>
+                <SelectContent>
+                  {botOptions.map((bot) => (
+                    <SelectItem key={bot.id} value={bot.id}>
+                      <div className="flex items-center gap-2">
+                        <span>{bot.emoji}</span>
+                        <span>{bot.name}</span>
+                        <Badge variant="outline" className="ml-1 text-xs">
+                          ELO {bot.rating}
+                        </Badge>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-          </DialogContent>
-        </Dialog>
-      </div>
+
+            {/* Time Selection */}
+            <div>
+              <label className="text-sm font-medium mb-2 block flex items-center gap-2">
+                <Clock className="w-4 h-4 text-primary" />
+                Select Time
+              </label>
+              <Select value={selectedTime} onValueChange={setSelectedTime}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Choose time" />
+                </SelectTrigger>
+                <SelectContent className="max-h-[200px]">
+                  {timeSlots.map((time) => (
+                    <SelectItem key={time} value={time}>
+                      {time}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <Button
+              onClick={scheduleGame}
+              disabled={saving || !selectedDate || !selectedTime || !selectedBot}
+              className="w-full"
+            >
+              {saving ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Scheduling...
+                </>
+              ) : (
+                <>
+                  <CalendarIcon className="w-4 h-4 mr-2" />
+                  Schedule Game
+                </>
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         <Card>
           <CardContent className="pt-6">
             <div className="text-center">
               <p className="text-3xl font-bold text-primary">{upcomingGames.length}</p>
-              <p className="text-sm text-muted-foreground">Upcoming Games</p>
+              <p className="text-sm text-muted-foreground">Upcoming</p>
             </div>
           </CardContent>
         </Card>
@@ -286,12 +299,12 @@ const GameScheduleTab = () => {
       </div>
 
       {/* Upcoming Games */}
-      <Card>
+      <Card className="lg:col-span-2">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="flex items-center gap-2">
-                <CalendarIcon className="w-5 h-5 text-primary" />
+                <Gamepad2 className="w-5 h-5 text-primary" />
                 Upcoming Games
               </CardTitle>
               <CardDescription>Your scheduled chess matches</CardDescription>
