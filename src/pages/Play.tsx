@@ -615,7 +615,7 @@ const Play = () => {
 
           {/* Playing Phase */}
           {gamePhase === "playing" && (
-            <div className="pb-48 lg:pb-0">
+            <div className="pb-52 lg:pb-0">
               <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 justify-center items-center lg:items-start">
                 <div className="flex flex-col items-center gap-2 sm:gap-4 order-1">
                   <div className="flex gap-1 sm:gap-2 mb-1 sm:mb-2 flex-wrap justify-center items-center">
