@@ -251,7 +251,7 @@ const CalendarTab = () => {
     if (!isStudent) return;
 
     if (assignedCoaches.length === 0) {
-      toast.error("No coach assigned yet. Please contact admin to get a coach.");
+      toast.info("A coach will be assigned to you soon. Please check back later!");
       return;
     }
 
@@ -409,7 +409,7 @@ const CalendarTab = () => {
             <Button
               variant="outline"
               className="gap-2"
-              onClick={() => toast.error("No coach assigned yet. Please contact admin to get a coach.")}
+              onClick={() => toast.info("A coach will be assigned to you soon. Please check back later!")}
             >
               <Plus className="w-4 h-4" />
               Book Session
