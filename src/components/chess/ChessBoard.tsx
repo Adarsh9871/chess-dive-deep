@@ -160,7 +160,7 @@ const ChessBoard = memo(({
   const displayFiles = isFlipped ? [...files].reverse() : files;
 
   return (
-    <div className="relative">
+    <div className="relative w-full max-w-[min(90vw,400px)] sm:max-w-none mx-auto">
       <div className="rounded-xl sm:rounded-2xl overflow-hidden shadow-xl sm:shadow-2xl border-2 sm:border-4 border-foreground/20">
         {displayRanks.map((rank, rankIndex) => (
           <div key={rank} className="flex">
@@ -175,7 +175,7 @@ const ChessBoard = memo(({
                 <div
                   key={square}
                   className={`
-                    relative w-10 h-10 xs:w-11 xs:h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-12 lg:h-12 xl:w-14 xl:h-14
+                    relative aspect-square flex-1
                     flex items-center justify-center cursor-pointer transition-colors duration-100
                     ${getSquareClasses(square, actualFileIndex, actualRankIndex)}
                   `}
@@ -183,28 +183,28 @@ const ChessBoard = memo(({
                 >
                   {/* Coordinates */}
                   {fileIndex === 0 && (
-                    <span className="absolute top-0.5 left-0.5 text-[8px] sm:text-[10px] font-bold text-foreground/50">
+                    <span className="absolute top-0.5 left-0.5 text-[7px] sm:text-[10px] font-bold text-foreground/50">
                       {rank}
                     </span>
                   )}
                   {rankIndex === 7 && (
-                    <span className="absolute bottom-0.5 right-0.5 text-[8px] sm:text-[10px] font-bold text-foreground/50">
+                    <span className="absolute bottom-0.5 right-0.5 text-[7px] sm:text-[10px] font-bold text-foreground/50">
                       {file}
                     </span>
                   )}
 
                   {/* Legal move dot */}
                   {isLegalMove && !piece && (
-                    <div className="absolute w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-primary/40" />
+                    <div className="absolute w-2.5 h-2.5 sm:w-4 sm:h-4 rounded-full bg-primary/40" />
                   )}
                   {isLegalMove && piece && (
-                    <div className="absolute inset-0 ring-4 ring-primary/40 ring-inset rounded-sm" />
+                    <div className="absolute inset-0 ring-2 sm:ring-4 ring-primary/40 ring-inset rounded-sm" />
                   )}
 
                   {/* Piece */}
                   {piece && (
                     <span
-                      className={`text-3xl xs:text-4xl sm:text-4xl md:text-5xl lg:text-4xl xl:text-5xl select-none drop-shadow-md ${
+                      className={`text-[clamp(1.5rem,8vw,3rem)] sm:text-4xl md:text-5xl select-none drop-shadow-md ${
                         piece.color === "w" ? "text-white" : "text-gray-900"
                       }`}
                       style={{
