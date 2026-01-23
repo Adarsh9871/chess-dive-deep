@@ -18,6 +18,7 @@ import {
   BookOpen,
   TrendingUp,
   Video,
+  Gamepad2,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -30,6 +31,7 @@ import CoachSlotRequestsTab from "@/components/coach/CoachSlotRequestsTab";
 import StudentSlotBookingTab from "@/components/dashboard/StudentSlotBookingTab";
 import StudentProgressTab from "@/components/dashboard/StudentProgressTab";
 import VideoSessionsTab from "@/components/dashboard/VideoSessionsTab";
+import GameScheduleTab from "@/components/dashboard/GameScheduleTab";
 
 const CoachDashboard = () => {
   const { user, signOut, loading } = useAuth();
@@ -143,6 +145,14 @@ const CoachDashboard = () => {
               </TabsTrigger>
             )}
 
+            {/* Games tab for students */}
+            {(isStudent || (!isCoach && !isAdmin)) && (
+              <TabsTrigger value="games" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center gap-2">
+                <Gamepad2 className="w-4 h-4" />
+                <span className="hidden sm:inline">Games</span>
+              </TabsTrigger>
+            )}
+
             <TabsTrigger value="calendar" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center gap-2">
               <Calendar className="w-4 h-4" />
               <span className="hidden sm:inline">Calendar</span>
@@ -203,6 +213,13 @@ const CoachDashboard = () => {
           {(isStudent || (!isCoach && !isAdmin)) && (
             <TabsContent value="progress">
               <StudentProgressTab />
+            </TabsContent>
+          )}
+
+          {/* Games Tab */}
+          {(isStudent || (!isCoach && !isAdmin)) && (
+            <TabsContent value="games">
+              <GameScheduleTab />
             </TabsContent>
           )}
 
