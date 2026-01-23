@@ -20,6 +20,7 @@ import ScheduledGamesPanel from "@/components/chess/ScheduledGamesPanel";
 import AuthModal from "@/components/auth/AuthModal";
 import { useChessBotWorker } from "@/hooks/useChessBotWorker";
 import { useAuth } from "@/hooks/useAuth";
+import { useGameSounds } from "@/hooks/useGameSounds";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -67,29 +68,8 @@ const Play = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Sound player
-  const playSound = useCallback((type: "move" | "capture" | "check" | "gameEnd") => {
-    if (!soundEnabled) return;
-    try {
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      const frequencies = { move: 440, capture: 330, check: 550, gameEnd: 660 };
-      
-      oscillator.frequency.value = frequencies[type];
-      oscillator.type = type === "capture" ? "square" : "sine";
-      gainNode.gain.value = 0.1;
-      
-      oscillator.start();
-      oscillator.stop(audioContext.currentTime + 0.1);
-    } catch (e) {
-      // Audio not supported
-    }
-  }, [soundEnabled]);
+  // Game sounds hook
+  const { playMove, playCapture, playCheck, playGameEnd, playGameStart } = useGameSounds(soundEnabled);
 
   // Thinking timer
   const startThinkingTimer = useCallback(() => {
@@ -123,26 +103,28 @@ const Play = () => {
       const newGame = new Chess(game.fen());
       const move = newGame.move(randomMove);
       
-      if (move) {
-        if (move.captured) {
-          setCapturedPieces((prev) => ({
-            ...prev,
-            [move.color === "w" ? "black" : "white"]: [
-              ...prev[move.color === "w" ? "black" : "white"],
-              move.captured!,
-            ],
-          }));
+        if (move) {
+          if (move.captured) {
+            setCapturedPieces((prev) => ({
+              ...prev,
+              [move.color === "w" ? "black" : "white"]: [
+                ...prev[move.color === "w" ? "black" : "white"],
+                move.captured!,
+              ],
+            }));
+            playCapture();
+          } else {
+            playMove();
+          }
+          setGame(newGame);
+          setLastMove({ from: move.from, to: move.to });
+          setMoveHistory((prev) => [...prev, move.san]);
+          setGameHistory((prev) => [...prev, game.fen()]);
+          toast.info("Bot made a quick move!");
         }
-        playSound(move.captured ? "capture" : "move");
-        setGame(newGame);
-        setLastMove({ from: move.from, to: move.to });
-        setMoveHistory((prev) => [...prev, move.san]);
-        setGameHistory((prev) => [...prev, game.fen()]);
-        toast.info("Bot made a quick move!");
-      }
     }
     setIsThinking(false);
-  }, [game, playerColor, playSound, botWorker, stopThinkingTimer]);
+  }, [game, playerColor, playMove, playCapture, botWorker, stopThinkingTimer]);
 
   // Bot move
   const makeBotMove = useCallback(() => {
@@ -175,8 +157,6 @@ const Play = () => {
 
           if (!move) return;
 
-          const soundType = move.captured ? "capture" : "move";
-
           setCapturedPieces((prev) => {
             if (!move.captured) return prev;
             return {
@@ -188,10 +168,14 @@ const Play = () => {
             };
           });
 
-          playSound(soundType);
+          if (move.captured) {
+            playCapture();
+          } else {
+            playMove();
+          }
 
           if (newGame.inCheck()) {
-            setTimeout(() => playSound("check"), 50);
+            setTimeout(() => playCheck(), 50);
             const checkMessages = [
               "Oh no! Your King is in check! Quick, find a safe spot!",
               "Watch out! The King needs to move to safety!",
@@ -205,7 +189,7 @@ const Play = () => {
           setMoveHistory((prev) => [...prev, move.san]);
 
           if (newGame.isGameOver()) {
-            playSound("gameEnd");
+            playGameEnd();
             const winner = newGame.turn() === playerColor ? "Bot" : "You";
             const message = newGame.isCheckmate()
               ? winner === "You"
@@ -234,7 +218,7 @@ const Play = () => {
           stopThinkingTimer();
         });
     }, 50);
-  }, [game, botDifficulty, playerColor, playSound, botWorker, startThinkingTimer, stopThinkingTimer, cancelBotMove]);
+  }, [game, botDifficulty, playerColor, playMove, playCapture, playCheck, playGameEnd, botWorker, startThinkingTimer, stopThinkingTimer, cancelBotMove]);
 
   // Trigger bot move
   useEffect(() => {
@@ -265,7 +249,7 @@ const Play = () => {
               move.captured!,
             ],
           }));
-          playSound("capture");
+          playCapture();
           const captureMessages = [
             `Awesome capture! You got their ${move.captured === 'q' ? 'Queen' : move.captured === 'r' ? 'Rook' : move.captured === 'b' ? 'Bishop' : move.captured === 'n' ? 'Knight' : 'Pawn'}!`,
             `Great job! That ${move.captured === 'q' ? 'Queen' : move.captured === 'r' ? 'Rook' : move.captured === 'b' ? 'Bishop' : move.captured === 'n' ? 'Knight' : 'Pawn'} is yours now!`,
@@ -273,11 +257,11 @@ const Play = () => {
           ];
           setVoiceMessage(captureMessages[Math.floor(Math.random() * captureMessages.length)]);
         } else {
-          playSound("move");
+          playMove();
         }
 
         if (newGame.inCheck()) {
-          playSound("check");
+          playCheck();
           const checkMessages = [
             "Check! You're attacking the King! Great move!",
             "Whoa! Check! The King is in trouble!",
@@ -293,7 +277,7 @@ const Play = () => {
         setHighlightedSquares(null);
 
         if (newGame.isGameOver()) {
-          playSound("gameEnd");
+          playGameEnd();
           const message = newGame.isCheckmate() 
             ? "Checkmate! You are amazing! You won the game!" 
             : "It's a draw! Great defensive play!";
@@ -307,7 +291,7 @@ const Play = () => {
       // Invalid move
     }
     return false;
-  }, [isThinking, game, playerColor, playSound]);
+  }, [isThinking, game, playerColor, playMove, playCapture, playCheck, playGameEnd]);
 
   // Go to schedule screen
   const goToSchedule = () => {
@@ -328,6 +312,7 @@ const Play = () => {
   const startGameNow = useCallback(() => {
     const bot = premiumBots.find((b) => b.id === botDifficulty);
     setGamePhase("playing");
+    playGameStart();
     const startMessages = [
       `Let's play chess with ${bot?.name}! You're white, so you go first. Have fun!`,
       `Awesome! Time to play against ${bot?.name}! Make your first move!`,
@@ -335,7 +320,7 @@ const Play = () => {
     ];
     setVoiceMessage(startMessages[Math.floor(Math.random() * startMessages.length)]);
     toast.success(`Game started against ${bot?.name}!`);
-  }, [botDifficulty]);
+  }, [botDifficulty, playGameStart]);
 
   // Schedule game
   const scheduleGame = async () => {
@@ -424,9 +409,9 @@ const Play = () => {
   // Resign
   const handleResign = useCallback(() => {
     toast.info("You resigned. Better luck next time!");
-    playSound("gameEnd");
+    playGameEnd();
     handleNewGame();
-  }, [playSound, handleNewGame]);
+  }, [playGameEnd, handleNewGame]);
 
   // Flip board
   const flipBoard = useCallback(() => {
@@ -718,24 +703,26 @@ const Play = () => {
                 exit={{ opacity: 0 }}
                 className="pb-56 lg:pb-4"
               >
-                {/* 3-column layout for desktop */}
-                <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr_280px] xl:grid-cols-[300px_1fr_300px] gap-4 lg:gap-6 max-w-7xl mx-auto items-start">
+                {/* 3-column layout for desktop - aligned to board */}
+                <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 max-w-7xl mx-auto lg:items-stretch">
                   
                   {/* Left panel - Game Info */}
-                  <div className="order-2 lg:order-1">
-                    <PremiumGameInfo
-                      game={game}
-                      playerColor={playerColor}
-                      botName={selectedBot?.name || "Bot"}
-                      botEmoji={selectedBot?.emoji || "🤖"}
-                      botRating={selectedBot?.rating || "~1000"}
-                      moveHistory={moveHistory}
-                      capturedPieces={capturedPieces}
-                    />
+                  <div className="order-2 lg:order-1 lg:w-[280px] xl:w-[300px] lg:flex-shrink-0">
+                    <div className="h-full">
+                      <PremiumGameInfo
+                        game={game}
+                        playerColor={playerColor}
+                        botName={selectedBot?.name || "Bot"}
+                        botEmoji={selectedBot?.emoji || "🤖"}
+                        botRating={selectedBot?.rating || "~1000"}
+                        moveHistory={moveHistory}
+                        capturedPieces={capturedPieces}
+                      />
+                    </div>
                   </div>
 
                   {/* Center - Main game area */}
-                  <div className="flex flex-col items-center gap-3 order-1 lg:order-2">
+                  <div className="flex flex-col items-center gap-3 order-1 lg:order-2 lg:flex-1 lg:min-w-0">
                     {/* Quick actions bar */}
                     <QuickActions
                       soundEnabled={soundEnabled}
@@ -789,14 +776,16 @@ const Play = () => {
                   </div>
 
                   {/* Right panel - Live Guide */}
-                  <div className="hidden lg:block order-3">
-                    <LiveGuide
-                      game={game}
-                      isPlayerTurn={game.turn() === playerColor && !isThinking}
-                      playerColor={playerColor}
-                      isGameOver={game.isGameOver()}
-                      onHighlightSquares={setHighlightedSquares}
-                    />
+                  <div className="hidden lg:block order-3 lg:w-[280px] xl:w-[300px] lg:flex-shrink-0">
+                    <div className="h-full">
+                      <LiveGuide
+                        game={game}
+                        isPlayerTurn={game.turn() === playerColor && !isThinking}
+                        playerColor={playerColor}
+                        isGameOver={game.isGameOver()}
+                        onHighlightSquares={setHighlightedSquares}
+                      />
+                    </div>
                   </div>
                 </div>
               </motion.div>
