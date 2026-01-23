@@ -67,7 +67,7 @@ interface MessageData {
 }
 
 const AdminPanel = () => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -84,6 +84,9 @@ const AdminPanel = () => {
 
   useEffect(() => {
     const checkAdmin = async () => {
+      // Wait until auth finishes hydrating the session on refresh.
+      if (authLoading) return;
+
       if (!user) {
         navigate("/");
         return;
@@ -109,7 +112,7 @@ const AdminPanel = () => {
     };
 
     checkAdmin();
-  }, [user, navigate]);
+  }, [user, authLoading, navigate]);
 
   const fetchPendingCounts = async () => {
     const [slotsRes, makeupRes] = await Promise.all([
