@@ -248,11 +248,16 @@ const CalendarTab = () => {
   };
 
   const handleCellClick = (day: Date, time: string) => {
-    if (isStudent && assignedCoaches.length > 0) {
-      setBookingDate(day);
-      setBookingTime(time);
-      setShowBookingDialog(true);
+    if (!isStudent) return;
+
+    if (assignedCoaches.length === 0) {
+      toast.error("No coach assigned yet. Please contact admin to get a coach.");
+      return;
     }
+
+    setBookingDate(day);
+    setBookingTime(time);
+    setShowBookingDialog(true);
   };
 
   return (
@@ -399,6 +404,17 @@ const CalendarTab = () => {
               </DialogContent>
             </Dialog>
           )}
+
+          {isStudent && assignedCoaches.length === 0 && (
+            <Button
+              variant="outline"
+              className="gap-2"
+              onClick={() => toast.error("No coach assigned yet. Please contact admin to get a coach.")}
+            >
+              <Plus className="w-4 h-4" />
+              Book Session
+            </Button>
+          )}
         </div>
       </div>
 
@@ -471,7 +487,7 @@ const CalendarTab = () => {
                         key={dayIndex}
                         className={`p-0.5 sm:p-1 border-l min-h-[50px] sm:min-h-[60px] transition-colors ${
                           isSameDay(day, new Date()) ? "bg-primary/5" : ""
-                        } ${!isPast && isStudent && assignedCoaches.length > 0 ? "hover:bg-muted/50 cursor-pointer" : ""}`}
+                        } ${!isPast && isStudent ? "hover:bg-muted/50 cursor-pointer" : ""}`}
                         onClick={() => !isPast && handleCellClick(day, time)}
                       >
                         {slotClasses.map((c) => (

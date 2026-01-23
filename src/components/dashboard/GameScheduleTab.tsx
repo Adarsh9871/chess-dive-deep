@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { format, isBefore, startOfToday, addDays, isSameDay, isToday, isTomorrow } from "date-fns";
+import { format, isBefore, startOfToday, isToday, isTomorrow } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { supabase } from "@/integrations/supabase/client";
@@ -98,6 +98,11 @@ const GameScheduleTab = () => {
     }
   };
 
+  const openScheduleDialog = () => {
+    setSelectedDate((prev) => prev ?? startOfToday());
+    setShowScheduleDialog(true);
+  };
+
   const scheduleGame = async () => {
     if (!user || !selectedDate || !selectedTime || !selectedBot) {
       toast.error("Please fill in all fields");
@@ -168,6 +173,24 @@ const GameScheduleTab = () => {
 
   return (
     <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-xl sm:text-2xl font-display font-bold text-foreground flex items-center gap-2">
+            <Gamepad2 className="w-6 h-6 text-primary" />
+            My Game Schedule
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Click a date or use the button to schedule a game
+          </p>
+        </div>
+
+        <Button onClick={openScheduleDialog} className="gap-2">
+          <Plus className="w-4 h-4" />
+          Schedule Game
+        </Button>
+      </div>
+
       {/* Main Calendar - Click to Schedule */}
       <Card className="lg:col-span-2">
         <CardHeader>
