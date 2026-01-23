@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { Crown, Menu, X, LogOut, User, LayoutDashboard } from "lucide-react";
-import { useState } from "react";
+import { Crown, Menu, X, LogOut, User, LayoutDashboard, Shield } from "lucide-react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import AuthModal from "@/components/auth/AuthModal";
 import {
   DropdownMenu,
@@ -18,9 +19,30 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
+  const [isAdmin, setIsAdmin] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut, loading } = useAuth();
+
+  useEffect(() => {
+    const checkAdmin = async () => {
+      if (!user) {
+        setIsAdmin(false);
+        return;
+      }
+      
+      const { data } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .eq("role", "admin")
+        .maybeSingle();
+      
+      setIsAdmin(!!data);
+    };
+
+    checkAdmin();
+  }, [user]);
 
   const navItems = [
     { label: "Play", href: "/play" },
@@ -113,12 +135,14 @@ const Header = () => {
                         Dashboard
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/admin" className="flex items-center gap-2">
-                        <User className="w-4 h-4" />
-                        Admin Panel
-                      </Link>
-                    </DropdownMenuItem>
+                    {isAdmin && (
+                      <DropdownMenuItem asChild>
+                        <Link to="/admin" className="flex items-center gap-2">
+                          <Shield className="w-4 h-4" />
+                          Admin Panel
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleSignOut} className="text-destructive">
                       <LogOut className="w-4 h-4 mr-2" />
@@ -197,14 +221,16 @@ const Header = () => {
                         <LayoutDashboard className="w-4 h-4" />
                         Dashboard
                       </Link>
-                      <Link
-                        to="/admin"
-                        className="py-3 px-4 rounded-xl hover:bg-muted font-display font-semibold text-foreground transition-colors flex items-center gap-2"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        <User className="w-4 h-4" />
-                        Admin Panel
-                      </Link>
+                      {isAdmin && (
+                        <Link
+                          to="/admin"
+                          className="py-3 px-4 rounded-xl hover:bg-muted font-display font-semibold text-foreground transition-colors flex items-center gap-2"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          <Shield className="w-4 h-4" />
+                          Admin Panel
+                        </Link>
+                      )}
                       <Button variant="destructive" className="w-full" onClick={handleSignOut}>
                         <LogOut className="w-4 h-4 mr-2" />
                         Sign Out

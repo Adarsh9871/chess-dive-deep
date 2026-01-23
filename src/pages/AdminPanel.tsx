@@ -21,6 +21,7 @@ import {
   Link2,
   Clock,
   RefreshCw,
+  Gamepad2,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -30,6 +31,7 @@ import { useNavigate } from "react-router-dom";
 import CoachAssignmentTab from "@/components/admin/CoachAssignmentTab";
 import SlotRequestsTab from "@/components/admin/SlotRequestsTab";
 import MakeupRequestsAdminTab from "@/components/admin/MakeupRequestsAdminTab";
+import ScheduledGamesAdminTab from "@/components/admin/ScheduledGamesAdminTab";
 
 type UserRole = "admin" | "coach" | "student";
 
@@ -286,11 +288,11 @@ const AdminPanel = () => {
           <TabsList className="bg-background border h-auto flex-wrap p-1">
             <TabsTrigger value="assignments" className="gap-2">
               <Link2 className="w-4 h-4" />
-              Assignments
+              <span className="hidden sm:inline">Assignments</span>
             </TabsTrigger>
             <TabsTrigger value="slots" className="gap-2 relative">
               <Clock className="w-4 h-4" />
-              Slot Requests
+              <span className="hidden sm:inline">Slot Requests</span>
               {pendingCounts.slots > 0 && (
                 <Badge variant="destructive" className="ml-1 h-5 w-5 p-0 flex items-center justify-center text-xs">
                   {pendingCounts.slots}
@@ -299,28 +301,32 @@ const AdminPanel = () => {
             </TabsTrigger>
             <TabsTrigger value="makeup" className="gap-2 relative">
               <RefreshCw className="w-4 h-4" />
-              Makeup Requests
+              <span className="hidden sm:inline">Makeup</span>
               {pendingCounts.makeup > 0 && (
                 <Badge variant="destructive" className="ml-1 h-5 w-5 p-0 flex items-center justify-center text-xs">
                   {pendingCounts.makeup}
                 </Badge>
               )}
             </TabsTrigger>
+            <TabsTrigger value="games" className="gap-2">
+              <Gamepad2 className="w-4 h-4" />
+              <span className="hidden sm:inline">Games</span>
+            </TabsTrigger>
             <TabsTrigger value="users" className="gap-2">
               <Users className="w-4 h-4" />
-              Users
+              <span className="hidden sm:inline">Users</span>
             </TabsTrigger>
             <TabsTrigger value="classes" className="gap-2">
               <Calendar className="w-4 h-4" />
-              Classes
+              <span className="hidden sm:inline">Classes</span>
             </TabsTrigger>
             <TabsTrigger value="messages" className="gap-2">
               <MessageSquare className="w-4 h-4" />
-              Messages
+              <span className="hidden sm:inline">Messages</span>
             </TabsTrigger>
             <TabsTrigger value="announce" className="gap-2">
               <Bell className="w-4 h-4" />
-              Announce
+              <span className="hidden sm:inline">Announce</span>
             </TabsTrigger>
           </TabsList>
 
@@ -337,6 +343,11 @@ const AdminPanel = () => {
           {/* Makeup Requests Tab */}
           <TabsContent value="makeup">
             <MakeupRequestsAdminTab />
+          </TabsContent>
+
+          {/* Scheduled Games Tab */}
+          <TabsContent value="games">
+            <ScheduledGamesAdminTab />
           </TabsContent>
 
           {/* Users Tab */}
