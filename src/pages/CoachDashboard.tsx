@@ -28,7 +28,7 @@ import CoachSlotRequestsTab from "@/components/coach/CoachSlotRequestsTab";
 import StudentSlotBookingTab from "@/components/dashboard/StudentSlotBookingTab";
 
 const CoachDashboard = () => {
-  const { user, signOut } = useAuth();
+  const { user, signOut, loading } = useAuth();
   const navigate = useNavigate();
   const [isAdmin, setIsAdmin] = useState(false);
   const [isCoach, setIsCoach] = useState(false);
@@ -37,6 +37,9 @@ const CoachDashboard = () => {
   const [pendingRequests, setPendingRequests] = useState(0);
 
   useEffect(() => {
+    // Wait until auth finishes hydrating the session on refresh.
+    if (loading) return;
+
     if (!user) {
       navigate("/");
       return;
@@ -45,7 +48,7 @@ const CoachDashboard = () => {
     checkRoles();
     fetchUnreadCount();
     fetchPendingRequests();
-  }, [user, navigate]);
+  }, [user, loading, navigate]);
 
   const checkRoles = async () => {
     if (!user) return;
