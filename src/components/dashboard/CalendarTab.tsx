@@ -1,3 +1,4 @@
+// CalendarTab - Student calendar and booking management
 import { useState, useEffect } from "react";
 import { format, startOfWeek, addDays, addWeeks, subWeeks, isSameDay, isBefore, startOfToday } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -259,7 +260,6 @@ const CalendarTab = () => {
     setBookingTime("");
     setBookingNotes("");
     fetchSlotRequests();
-  };
   };
 
   const updateClassStatus = async (classId: string, newStatus: string) => {
