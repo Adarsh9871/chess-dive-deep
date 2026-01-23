@@ -16,6 +16,8 @@ import {
   GraduationCap,
   ClipboardList,
   BookOpen,
+  TrendingUp,
+  Video,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,6 +28,8 @@ import CoachAvailabilityTab from "@/components/coach/CoachAvailabilityTab";
 import MyStudentsTab from "@/components/coach/MyStudentsTab";
 import CoachSlotRequestsTab from "@/components/coach/CoachSlotRequestsTab";
 import StudentSlotBookingTab from "@/components/dashboard/StudentSlotBookingTab";
+import StudentProgressTab from "@/components/dashboard/StudentProgressTab";
+import VideoSessionsTab from "@/components/dashboard/VideoSessionsTab";
 
 const CoachDashboard = () => {
   const { user, signOut, loading } = useAuth();
@@ -129,11 +133,25 @@ const CoachDashboard = () => {
       </div>
 
       <main className="container px-4 mx-auto py-6">
-        <Tabs defaultValue="calendar" className="space-y-6">
+        <Tabs defaultValue={isStudent ? "progress" : "calendar"} className="space-y-6">
           <TabsList className="bg-background border h-auto p-1 flex flex-wrap gap-1">
+            {/* Student progress tab - shown first for students */}
+            {(isStudent || (!isCoach && !isAdmin)) && (
+              <TabsTrigger value="progress" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center gap-2">
+                <TrendingUp className="w-4 h-4" />
+                <span className="hidden sm:inline">My Progress</span>
+              </TabsTrigger>
+            )}
+
             <TabsTrigger value="calendar" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center gap-2">
               <Calendar className="w-4 h-4" />
               <span className="hidden sm:inline">Calendar</span>
+            </TabsTrigger>
+
+            {/* Video Sessions tab */}
+            <TabsTrigger value="video" className="data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground flex items-center gap-2">
+              <Video className="w-4 h-4" />
+              <span className="hidden sm:inline">Video</span>
             </TabsTrigger>
             
             {/* Student booking tab */}
@@ -181,8 +199,20 @@ const CoachDashboard = () => {
             </TabsTrigger>
           </TabsList>
 
+          {/* Student Progress Tab */}
+          {(isStudent || (!isCoach && !isAdmin)) && (
+            <TabsContent value="progress">
+              <StudentProgressTab />
+            </TabsContent>
+          )}
+
           <TabsContent value="calendar">
             <CalendarTab />
+          </TabsContent>
+
+          {/* Video Sessions Tab */}
+          <TabsContent value="video">
+            <VideoSessionsTab isCoach={isCoach} />
           </TabsContent>
 
           {(isStudent || (!isCoach && !isAdmin)) && (

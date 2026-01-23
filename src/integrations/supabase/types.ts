@@ -130,6 +130,51 @@ export type Database = {
         }
         Relationships: []
       }
+      game_history: {
+        Row: {
+          created_at: string
+          duration_seconds: number | null
+          fen_final: string | null
+          id: string
+          moves_count: number
+          opponent_difficulty: string | null
+          opponent_name: string | null
+          opponent_type: string
+          player_color: string
+          result: string
+          user_id: string
+          xp_earned: number
+        }
+        Insert: {
+          created_at?: string
+          duration_seconds?: number | null
+          fen_final?: string | null
+          id?: string
+          moves_count?: number
+          opponent_difficulty?: string | null
+          opponent_name?: string | null
+          opponent_type?: string
+          player_color: string
+          result: string
+          user_id: string
+          xp_earned?: number
+        }
+        Update: {
+          created_at?: string
+          duration_seconds?: number | null
+          fen_final?: string | null
+          id?: string
+          moves_count?: number
+          opponent_difficulty?: string | null
+          opponent_name?: string | null
+          opponent_type?: string
+          player_color?: string
+          result?: string
+          user_id?: string
+          xp_earned?: number
+        }
+        Relationships: []
+      }
       makeup_requests: {
         Row: {
           created_at: string
@@ -291,6 +336,39 @@ export type Database = {
         }
         Relationships: []
       }
+      puzzle_progress: {
+        Row: {
+          attempts: number
+          created_at: string
+          id: string
+          puzzle_id: string
+          solved: boolean
+          stars_earned: number
+          time_seconds: number | null
+          user_id: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          id?: string
+          puzzle_id: string
+          solved?: boolean
+          stars_earned?: number
+          time_seconds?: number | null
+          user_id: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          id?: string
+          puzzle_id?: string
+          solved?: boolean
+          stars_earned?: number
+          time_seconds?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       scheduled_games: {
         Row: {
           bot_difficulty: string
@@ -383,6 +461,50 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      video_sessions: {
+        Row: {
+          class_id: string | null
+          coach_id: string
+          created_at: string
+          ended_at: string | null
+          id: string
+          room_name: string
+          started_at: string | null
+          status: string
+          student_id: string
+        }
+        Insert: {
+          class_id?: string | null
+          coach_id: string
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          room_name: string
+          started_at?: string | null
+          status?: string
+          student_id: string
+        }
+        Update: {
+          class_id?: string | null
+          coach_id?: string
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          room_name?: string
+          started_at?: string | null
+          status?: string
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_sessions_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
