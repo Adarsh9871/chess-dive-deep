@@ -14,6 +14,7 @@ import DemoClass from "./pages/DemoClass";
 import CoachDashboard from "./pages/CoachDashboard";
 import AdminPanel from "./pages/AdminPanel";
 import Program from "./pages/Program";
+import Upgrade from "./pages/Upgrade";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ const App = () => (
           <Route path="/dashboard" element={<CoachDashboard />} />
           <Route path="/admin" element={<AdminPanel />} />
           <Route path="/program" element={<Program />} />
+          <Route path="/upgrade" element={<Upgrade />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

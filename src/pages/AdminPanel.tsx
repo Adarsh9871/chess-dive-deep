@@ -23,6 +23,12 @@ import {
   RefreshCw,
   Gamepad2,
   UserPlus,
+  BookOpen,
+  FileText,
+  Video,
+  Settings,
+  CreditCard,
+  Crown,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -34,6 +40,12 @@ import SlotRequestsTab from "@/components/admin/SlotRequestsTab";
 import MakeupRequestsAdminTab from "@/components/admin/MakeupRequestsAdminTab";
 import ScheduledGamesAdminTab from "@/components/admin/ScheduledGamesAdminTab";
 import CreateCoachTab from "@/components/admin/CreateCoachTab";
+import ProgramsTab from "@/components/admin/ProgramsTab";
+import BlogsTab from "@/components/admin/BlogsTab";
+import LessonsTab from "@/components/admin/LessonsTab";
+import SettingsTab from "@/components/admin/SettingsTab";
+import PaymentHistoryTab from "@/components/admin/PaymentHistoryTab";
+import SubscriptionPlansTab from "@/components/admin/SubscriptionPlansTab";
 
 type UserRole = "admin" | "coach" | "student";
 
@@ -297,7 +309,7 @@ const AdminPanel = () => {
             </TabsTrigger>
             <TabsTrigger value="slots" className="gap-2 relative">
               <Clock className="w-4 h-4" />
-              <span className="hidden sm:inline">Slot Requests</span>
+              <span className="hidden sm:inline">Slots</span>
               {pendingCounts.slots > 0 && (
                 <Badge variant="destructive" className="ml-1 h-5 w-5 p-0 flex items-center justify-center text-xs">
                   {pendingCounts.slots}
@@ -313,29 +325,37 @@ const AdminPanel = () => {
                 </Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="games" className="gap-2">
-              <Gamepad2 className="w-4 h-4" />
-              <span className="hidden sm:inline">Games</span>
-            </TabsTrigger>
-            <TabsTrigger value="create-coach" className="gap-2">
-              <UserPlus className="w-4 h-4" />
-              <span className="hidden sm:inline">Create Coach</span>
-            </TabsTrigger>
             <TabsTrigger value="users" className="gap-2">
               <Users className="w-4 h-4" />
               <span className="hidden sm:inline">Users</span>
             </TabsTrigger>
-            <TabsTrigger value="classes" className="gap-2">
-              <Calendar className="w-4 h-4" />
-              <span className="hidden sm:inline">Classes</span>
+            <TabsTrigger value="create-coach" className="gap-2">
+              <UserPlus className="w-4 h-4" />
+              <span className="hidden sm:inline">Coach</span>
             </TabsTrigger>
-            <TabsTrigger value="messages" className="gap-2">
-              <MessageSquare className="w-4 h-4" />
-              <span className="hidden sm:inline">Messages</span>
+            <TabsTrigger value="programs" className="gap-2">
+              <BookOpen className="w-4 h-4" />
+              <span className="hidden sm:inline">Programs</span>
             </TabsTrigger>
-            <TabsTrigger value="announce" className="gap-2">
-              <Bell className="w-4 h-4" />
-              <span className="hidden sm:inline">Announce</span>
+            <TabsTrigger value="lessons" className="gap-2">
+              <Video className="w-4 h-4" />
+              <span className="hidden sm:inline">Lessons</span>
+            </TabsTrigger>
+            <TabsTrigger value="blogs" className="gap-2">
+              <FileText className="w-4 h-4" />
+              <span className="hidden sm:inline">Blogs</span>
+            </TabsTrigger>
+            <TabsTrigger value="plans" className="gap-2">
+              <Crown className="w-4 h-4" />
+              <span className="hidden sm:inline">Plans</span>
+            </TabsTrigger>
+            <TabsTrigger value="payments" className="gap-2">
+              <CreditCard className="w-4 h-4" />
+              <span className="hidden sm:inline">Payments</span>
+            </TabsTrigger>
+            <TabsTrigger value="settings" className="gap-2">
+              <Settings className="w-4 h-4" />
+              <span className="hidden sm:inline">Settings</span>
             </TabsTrigger>
           </TabsList>
 
